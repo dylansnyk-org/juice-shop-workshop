@@ -1,0 +1,2185 @@
+{
+   "$schema" : "https://cyclonedx.org/schema/bom-1.6.schema.json",
+   "bomFormat" : "CycloneDX",
+   "components" : [
+      {
+         "bom-ref" : "agent:smolagents.agents.ZeroShotAgent",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 1,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 19,
+                  "location" : "agent.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "smolagents.agents.ZeroShotAgent",
+         "type" : "application"
+      },
+      {
+         "bom-ref" : "application:Root",
+         "name" : "Root",
+         "type" : "application"
+      },
+      {
+         "bom-ref" : "dataset:code_search_net",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/code_search_net"
+            }
+         ],
+         "name" : "code_search_net",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:collaiborateorg/BioMedData",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/collaiborateorg/BioMedData"
+            },
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/collaiborateorg/BioMedData"
+            }
+         ],
+         "name" : "collaiborateorg/BioMedData",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:eli5",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/eli5"
+            }
+         ],
+         "name" : "eli5",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/PAQ_pairs",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/PAQ_pairs"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/PAQ_pairs",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/QQP",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/QQP"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/QQP",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/SPECTER",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/SPECTER"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/SPECTER",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/WikiAnswers",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/WikiAnswers"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/WikiAnswers",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/altlex",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/altlex"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/altlex",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/flickr30k-captions",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/flickr30k-captions"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/flickr30k-captions",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/sentence-compression",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/sentence-compression"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/sentence-compression",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/simple-wiki",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/simple-wiki"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/simple-wiki",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:flax-sentence-embeddings/stackexchange_xml",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/flax-sentence-embeddings/stackexchange_xml"
+            }
+         ],
+         "name" : "flax-sentence-embeddings/stackexchange_xml",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:gooaq",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/gooaq"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "Apache-2.0",
+                  "url" : "https://spdx.org/licenses/Apache-2.0.html"
+               }
+            }
+         ],
+         "name" : "gooaq",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:ms_marco",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/ms_marco"
+            }
+         ],
+         "name" : "ms_marco",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:multi_nli",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/multi_nli"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "CC-BY-3.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-3.0.html"
+               }
+            },
+            {
+               "license" : {
+                  "id" : "CC-BY-SA-3.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-SA-3.0.html"
+               }
+            },
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "multi_nli",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:natural_questions",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/natural_questions"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "CC-BY-SA-3.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-SA-3.0.html"
+               }
+            }
+         ],
+         "name" : "natural_questions",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:s2orc",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/s2orc"
+            }
+         ],
+         "name" : "s2orc",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:search_qa",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/search_qa"
+            }
+         ],
+         "name" : "search_qa",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:snli",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/snli"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "CC-BY-SA-4.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-SA-4.0.html"
+               }
+            }
+         ],
+         "name" : "snli",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:trivia_qa",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/trivia_qa"
+            }
+         ],
+         "name" : "trivia_qa",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:wikihow",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/wikihow"
+            }
+         ],
+         "name" : "wikihow",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:yahoo_answers_topics",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/yahoo_answers_topics"
+            }
+         ],
+         "name" : "yahoo_answers_topics",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "authors" : [
+            {
+               "name" : "ContactDoctor"
+            }
+         ],
+         "bom-ref" : "model:ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1",
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1"
+            }
+         ],
+         "modelCard" : {
+            "modelParameters" : {
+               "datasets" : [
+                  {
+                     "ref" : "dataset:collaiborateorg/BioMedData"
+                  }
+               ]
+            }
+         },
+         "name" : "ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "authors" : [
+            {
+               "name" : "Junnan Li"
+            },
+            {
+               "name" : "Dongxu Li"
+            },
+            {
+               "name" : "Caiming Xiong"
+            },
+            {
+               "name" : "Steven Hoi"
+            }
+         ],
+         "bom-ref" : "model:Salesforce/blip-vqa-base",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 5,
+                  "location" : "blip.py",
+                  "offset" : 43
+               },
+               {
+                  "line" : 5,
+                  "location" : "blip.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 6,
+                  "location" : "blip.py",
+                  "offset" : 50
+               },
+               {
+                  "line" : 6,
+                  "location" : "blip.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/Salesforce/blip-vqa-base"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "BSD-3-Clause",
+                  "url" : "https://spdx.org/licenses/BSD-3-Clause.html"
+               }
+            }
+         ],
+         "name" : "Salesforce/blip-vqa-base",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:black-forest-labs/FLUX.1-dev",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.29999999999999999,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 6,
+                  "location" : "diffusers_example.py",
+                  "offset" : 14
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/black-forest-labs/FLUX.1-dev"
+            }
+         ],
+         "name" : "black-forest-labs/FLUX.1-dev",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:claude-3-5-sonnet-20240620",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 18,
+                  "location" : "chatbot.py",
+                  "offset" : 20
+               },
+               {
+                  "line" : 27,
+                  "location" : "chatbot.py",
+                  "offset" : 20
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://docs.anthropic.com/en/docs/about-claude/models/all-models#model-comparison-table"
+            }
+         ],
+         "manufacturer" : {
+            "name" : "Anthropic PBC",
+            "url" : [ "https://www.anthropic.com" ]
+         },
+         "name" : "claude-3-5-sonnet-20240620",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:gpt-4",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 11,
+                  "location" : "agent.py",
+                  "offset" : 70
+               },
+               {
+                  "line" : 11,
+                  "location" : "agent.py",
+                  "offset" : 7
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://platform.openai.com/docs/models/gpt-4"
+            }
+         ],
+         "manufacturer" : {
+            "name" : "OpenAI, Inc.",
+            "url" : [ "https://openai.com" ]
+         },
+         "name" : "gpt-4",
+         "type" : "machine-learning-model"
+      },
+      {
+         "authors" : [
+            {
+               "name" : "Aaditya Singh"
+            },
+            {
+               "name" : "Aaron Grattafiori"
+            },
+            {
+               "name" : "Abhimanyu Dubey"
+            },
+            {
+               "name" : "Abhinav Jauhri"
+            },
+            {
+               "name" : "Abhinav Pandey"
+            },
+            {
+               "name" : "Abhishek Kadian"
+            },
+            {
+               "name" : "Adam Kelsey"
+            },
+            {
+               "name" : "Adi Gangidi"
+            },
+            {
+               "name" : "Ahmad Al-Dahle"
+            },
+            {
+               "name" : "Ahuva Goldstand"
+            },
+            {
+               "name" : "Aiesha Letman"
+            },
+            {
+               "name" : "Ajay Menon"
+            },
+            {
+               "name" : "Akhil Mathur"
+            },
+            {
+               "name" : "Alan Schelten"
+            },
+            {
+               "name" : "Alex Vaughan"
+            },
+            {
+               "name" : "Amy Yang"
+            },
+            {
+               "name" : "Andrei Lupu"
+            },
+            {
+               "name" : "Andres Alvarado"
+            },
+            {
+               "name" : "Andrew Gallagher"
+            },
+            {
+               "name" : "Andrew Gu"
+            },
+            {
+               "name" : "Andrew Ho"
+            },
+            {
+               "name" : "Andrew Poulton"
+            },
+            {
+               "name" : "Andrew Ryan"
+            },
+            {
+               "name" : "Angela Fan"
+            },
+            {
+               "name" : "Ankit Ramchandani"
+            },
+            {
+               "name" : "Anthony Hartshorn"
+            },
+            {
+               "name" : "Archi Mitra"
+            },
+            {
+               "name" : "Archie Sravankumar"
+            },
+            {
+               "name" : "Artem Korenev"
+            },
+            {
+               "name" : "Arun Rao"
+            },
+            {
+               "name" : "Ashley Gabriel"
+            },
+            {
+               "name" : "Ashwin Bharambe"
+            },
+            {
+               "name" : "Assaf Eisenman"
+            },
+            {
+               "name" : "Aston Zhang"
+            },
+            {
+               "name" : "Aurelien Rodriguez"
+            },
+            {
+               "name" : "Austen Gregerson"
+            },
+            {
+               "name" : "Ava Spataru"
+            },
+            {
+               "name" : "Baptiste Roziere"
+            },
+            {
+               "name" : "Ben Maurer"
+            },
+            {
+               "name" : "Benjamin Leonhardi"
+            },
+            {
+               "name" : "Bernie Huang"
+            },
+            {
+               "name" : "Bhargavi Paranjape"
+            },
+            {
+               "name" : "Bing Liu"
+            },
+            {
+               "name" : "Binh Tang"
+            },
+            {
+               "name" : "Bobbie Chern"
+            },
+            {
+               "name" : "Brani Stojkovic"
+            },
+            {
+               "name" : "Brian Fuller"
+            },
+            {
+               "name" : "Catalina Mejia Arenas"
+            },
+            {
+               "name" : "Chao Zhou"
+            },
+            {
+               "name" : "Charlotte Caucheteux"
+            },
+            {
+               "name" : "Chaya Nayak"
+            },
+            {
+               "name" : "Ching-Hsiang Chu"
+            },
+            {
+               "name" : "Chloe Bi"
+            },
+            {
+               "name" : "Chris Cai"
+            },
+            {
+               "name" : "Chris Cox"
+            },
+            {
+               "name" : "Chris Marra"
+            },
+            {
+               "name" : "Chris McConnell"
+            },
+            {
+               "name" : "Christian Keller"
+            },
+            {
+               "name" : "Christoph Feichtenhofer"
+            },
+            {
+               "name" : "Christophe Touret"
+            },
+            {
+               "name" : "Chunyang Wu"
+            },
+            {
+               "name" : "Corinne Wong"
+            },
+            {
+               "name" : "Cristian Canton Ferrer"
+            },
+            {
+               "name" : "Damien Allonsius"
+            },
+            {
+               "name" : "Daniel Kreymer"
+            },
+            {
+               "name" : "Daniel Haziza"
+            },
+            {
+               "name" : "Daniel Li"
+            },
+            {
+               "name" : "Danielle Pintz"
+            },
+            {
+               "name" : "Danny Livshits"
+            },
+            {
+               "name" : "Danny Wyatt"
+            },
+            {
+               "name" : "David Adkins"
+            },
+            {
+               "name" : "David Esiobu"
+            },
+            {
+               "name" : "David Xu"
+            },
+            {
+               "name" : "Davide Testuggine"
+            },
+            {
+               "name" : "Delia David"
+            },
+            {
+               "name" : "Devi Parikh"
+            },
+            {
+               "name" : "Dhruv Choudhary"
+            },
+            {
+               "name" : "Dhruv Mahajan"
+            },
+            {
+               "name" : "Diana Liskovich"
+            },
+            {
+               "name" : "Diego Garcia-Olano"
+            },
+            {
+               "name" : "Diego Perino"
+            },
+            {
+               "name" : "Dieuwke Hupkes"
+            },
+            {
+               "name" : "Dingkang Wang"
+            },
+            {
+               "name" : "Dustin Holland"
+            },
+            {
+               "name" : "Egor Lakomkin"
+            },
+            {
+               "name" : "Elina Lobanova"
+            },
+            {
+               "name" : "Xiaoqing Ellen Tan"
+            },
+            {
+               "name" : "Emily Dinan"
+            },
+            {
+               "name" : "Eric Smith"
+            },
+            {
+               "name" : "Erik Brinkman"
+            },
+            {
+               "name" : "Esteban Arcaute"
+            },
+            {
+               "name" : "Filip Radenovic"
+            },
+            {
+               "name" : "Firat Ozgenel"
+            },
+            {
+               "name" : "Francesco Caggioni"
+            },
+            {
+               "name" : "Frank Seide"
+            },
+            {
+               "name" : "Frank Zhang"
+            },
+            {
+               "name" : "Gabriel Synnaeve"
+            },
+            {
+               "name" : "Gabriella Schwarz"
+            },
+            {
+               "name" : "Gabrielle Lee"
+            },
+            {
+               "name" : "Gada Badeer"
+            },
+            {
+               "name" : "Georgia Anderson"
+            },
+            {
+               "name" : "Graeme Nail"
+            },
+            {
+               "name" : "Gregoire Mialon"
+            },
+            {
+               "name" : "Guan Pang"
+            },
+            {
+               "name" : "Guillem Cucurell"
+            },
+            {
+               "name" : "Hailey Nguyen"
+            },
+            {
+               "name" : "Hannah Korevaar"
+            },
+            {
+               "name" : "Hannah Wang"
+            },
+            {
+               "name" : "Haroun Habeeb"
+            },
+            {
+               "name" : "Harrison Rudolph"
+            },
+            {
+               "name" : "Henry Aspegren"
+            },
+            {
+               "name" : "Hu Xu"
+            },
+            {
+               "name" : "Hugo Touvron"
+            },
+            {
+               "name" : "Iga Kozlowska"
+            },
+            {
+               "name" : "Igor Molybog"
+            },
+            {
+               "name" : "Igor Tufanov"
+            },
+            {
+               "name" : "Iliyan Zarov"
+            },
+            {
+               "name" : "Imanol Arrieta Ibarra"
+            },
+            {
+               "name" : "Irina-Elena Veliche"
+            },
+            {
+               "name" : "Isabel Kloumann"
+            },
+            {
+               "name" : "Ishan Misra"
+            },
+            {
+               "name" : "Ivan Evtimov"
+            },
+            {
+               "name" : "Jacob Xu"
+            },
+            {
+               "name" : "Jade Copet"
+            },
+            {
+               "name" : "Jake Weissman"
+            },
+            {
+               "name" : "Jan Geffert"
+            },
+            {
+               "name" : "Jana Vranes"
+            },
+            {
+               "name" : "Japhet Asher"
+            },
+            {
+               "name" : "Jason Park"
+            },
+            {
+               "name" : "Jay Mahadeokar"
+            },
+            {
+               "name" : "Jean-Baptiste Gaya"
+            },
+            {
+               "name" : "Jeet Shah"
+            },
+            {
+               "name" : "Jelmer van der Linde"
+            },
+            {
+               "name" : "Jennifer Chan"
+            },
+            {
+               "name" : "Jenny Hong"
+            },
+            {
+               "name" : "Jenya Lee"
+            },
+            {
+               "name" : "Jeremy Fu"
+            },
+            {
+               "name" : "Jeremy Teboul"
+            },
+            {
+               "name" : "Jianfeng Chi"
+            },
+            {
+               "name" : "Jianyu Huang"
+            },
+            {
+               "name" : "Jie Wang"
+            },
+            {
+               "name" : "Jiecao Yu"
+            },
+            {
+               "name" : "Joanna Bitton"
+            },
+            {
+               "name" : "Joe Spisak"
+            },
+            {
+               "name" : "Joelle Pineau"
+            },
+            {
+               "name" : "Jon Carvill"
+            },
+            {
+               "name" : "Jongsoo Park"
+            },
+            {
+               "name" : "Joseph Rocca"
+            },
+            {
+               "name" : "Joshua Johnstun"
+            },
+            {
+               "name" : "Junteng Jia"
+            },
+            {
+               "name" : "Kalyan Vasuden Alwala"
+            },
+            {
+               "name" : "Kam Hou U"
+            },
+            {
+               "name" : "Kate Plawiak"
+            },
+            {
+               "name" : "Kartikeya Upasani"
+            },
+            {
+               "name" : "Kaushik Veeraraghavan"
+            },
+            {
+               "name" : "Ke Li"
+            },
+            {
+               "name" : "Kenneth Heafield"
+            },
+            {
+               "name" : "Kevin Stone"
+            },
+            {
+               "name" : "Khalid El-Arini"
+            },
+            {
+               "name" : "Krithika Iyer"
+            },
+            {
+               "name" : "Kshitiz Malik"
+            },
+            {
+               "name" : "Kuenley Chiu"
+            },
+            {
+               "name" : "Kunal Bhalla"
+            },
+            {
+               "name" : "Kyle Huang"
+            },
+            {
+               "name" : "Lakshya Garg"
+            },
+            {
+               "name" : "Lauren Rantala-Yeary"
+            },
+            {
+               "name" : "Laurens van der Maaten"
+            },
+            {
+               "name" : "Lawrence Chen"
+            },
+            {
+               "name" : "Leandro Silva"
+            },
+            {
+               "name" : "Lee Bell"
+            },
+            {
+               "name" : "Lei Zhang"
+            },
+            {
+               "name" : "Liang Tan"
+            },
+            {
+               "name" : "Louis Martin"
+            },
+            {
+               "name" : "Lovish Madaan"
+            },
+            {
+               "name" : "Luca Wehrstedt"
+            },
+            {
+               "name" : "Lukas Blecher"
+            },
+            {
+               "name" : "Luke de Oliveira"
+            },
+            {
+               "name" : "Madeline Muzzi"
+            },
+            {
+               "name" : "Madian Khabsa"
+            },
+            {
+               "name" : "Manav Avlani"
+            },
+            {
+               "name" : "Mannat Singh"
+            },
+            {
+               "name" : "Manohar Paluri"
+            },
+            {
+               "name" : "Mark Zuckerberg"
+            },
+            {
+               "name" : "Marcin Kardas"
+            },
+            {
+               "name" : "Martynas Mankus"
+            },
+            {
+               "name" : "Mathew Oldham"
+            },
+            {
+               "name" : "Mathieu Rita"
+            },
+            {
+               "name" : "Matthew Lennie"
+            },
+            {
+               "name" : "Maya Pavlova"
+            },
+            {
+               "name" : "Meghan Keneally"
+            },
+            {
+               "name" : "Melanie Kambadur"
+            },
+            {
+               "name" : "Mihir Patel"
+            },
+            {
+               "name" : "Mikayel Samvelyan"
+            },
+            {
+               "name" : "Mike Clark"
+            },
+            {
+               "name" : "Mike Lewis"
+            },
+            {
+               "name" : "Min Si"
+            },
+            {
+               "name" : "Mitesh Kumar Singh"
+            },
+            {
+               "name" : "Mo Metanat"
+            },
+            {
+               "name" : "Mona Hassan"
+            },
+            {
+               "name" : "Naman Goyal"
+            },
+            {
+               "name" : "Narjes Torabi"
+            },
+            {
+               "name" : "Nicolas Usunier"
+            },
+            {
+               "name" : "Nikolay Bashlykov"
+            },
+            {
+               "name" : "Nikolay Bogoychev"
+            },
+            {
+               "name" : "Niladri Chatterji"
+            },
+            {
+               "name" : "Ning Dong"
+            },
+            {
+               "name" : "Oliver Aobo Yang"
+            },
+            {
+               "name" : "Olivier Duchenne"
+            },
+            {
+               "name" : "Onur Celebi"
+            },
+            {
+               "name" : "Parth Parekh"
+            },
+            {
+               "name" : "Patrick Alrassy"
+            },
+            {
+               "name" : "Paul Saab"
+            },
+            {
+               "name" : "Pavan Balaji"
+            },
+            {
+               "name" : "Pedro Rittner"
+            },
+            {
+               "name" : "Pengchuan Zhang"
+            },
+            {
+               "name" : "Pengwei Li"
+            },
+            {
+               "name" : "Petar Vasic"
+            },
+            {
+               "name" : "Peter Weng"
+            },
+            {
+               "name" : "Polina Zvyagina"
+            },
+            {
+               "name" : "Prajjwal Bhargava"
+            },
+            {
+               "name" : "Pratik Dubal"
+            },
+            {
+               "name" : "Praveen Krishnan"
+            },
+            {
+               "name" : "Punit Singh Koura"
+            },
+            {
+               "name" : "Qing He"
+            },
+            {
+               "name" : "Rachel Rodriguez"
+            },
+            {
+               "name" : "Ragavan Srinivasan"
+            },
+            {
+               "name" : "Rahul Mitra"
+            },
+            {
+               "name" : "Ramon Calderer"
+            },
+            {
+               "name" : "Raymond Li"
+            },
+            {
+               "name" : "Robert Stojnic"
+            },
+            {
+               "name" : "Roberta Raileanu"
+            },
+            {
+               "name" : "Robin Battey"
+            },
+            {
+               "name" : "Rocky Wang"
+            },
+            {
+               "name" : "Rohit Girdhar"
+            },
+            {
+               "name" : "Rohit Patel"
+            },
+            {
+               "name" : "Romain Sauvestre"
+            },
+            {
+               "name" : "Ronnie Polidoro"
+            },
+            {
+               "name" : "Roshan Sumbaly"
+            },
+            {
+               "name" : "Ross Taylor"
+            },
+            {
+               "name" : "Ruan Silva"
+            },
+            {
+               "name" : "Rui Hou"
+            },
+            {
+               "name" : "Rui Wang"
+            },
+            {
+               "name" : "Russ Howes"
+            },
+            {
+               "name" : "Ruty Rinott"
+            },
+            {
+               "name" : "Saghar Hosseini"
+            },
+            {
+               "name" : "Sai Jayesh Bondu"
+            },
+            {
+               "name" : "Samyak Datta"
+            },
+            {
+               "name" : "Sanjay Singh"
+            },
+            {
+               "name" : "Sara Chugh"
+            },
+            {
+               "name" : "Sargun Dhillon"
+            },
+            {
+               "name" : "Satadru Pan"
+            },
+            {
+               "name" : "Sean Bell"
+            },
+            {
+               "name" : "Sergey Edunov"
+            },
+            {
+               "name" : "Shaoliang Nie"
+            },
+            {
+               "name" : "Sharan Narang"
+            },
+            {
+               "name" : "Sharath Raparthy"
+            },
+            {
+               "name" : "Shaun Lindsay"
+            },
+            {
+               "name" : "Sheng Feng"
+            },
+            {
+               "name" : "Sheng Shen"
+            },
+            {
+               "name" : "Shenghao Lin"
+            },
+            {
+               "name" : "Shiva Shankar"
+            },
+            {
+               "name" : "Shruti Bhosale"
+            },
+            {
+               "name" : "Shun Zhang"
+            },
+            {
+               "name" : "Simon Vandenhende"
+            },
+            {
+               "name" : "Sinong Wang"
+            },
+            {
+               "name" : "Seohyun Sonia Kim"
+            },
+            {
+               "name" : "Soumya Batra"
+            },
+            {
+               "name" : "Sten Sootla"
+            },
+            {
+               "name" : "Steve Kehoe"
+            },
+            {
+               "name" : "Suchin Gururangan"
+            },
+            {
+               "name" : "Sumit Gupta"
+            },
+            {
+               "name" : "Sunny Virk"
+            },
+            {
+               "name" : "Sydney Borodinsky"
+            },
+            {
+               "name" : "Tamar Glaser"
+            },
+            {
+               "name" : "Tamar Herman"
+            },
+            {
+               "name" : "Tamara Best"
+            },
+            {
+               "name" : "Tara Fowler"
+            },
+            {
+               "name" : "Thomas Georgiou"
+            },
+            {
+               "name" : "Thomas Scialom"
+            },
+            {
+               "name" : "Tianhe Li"
+            },
+            {
+               "name" : "Todor Mihaylov"
+            },
+            {
+               "name" : "Tong Xiao"
+            },
+            {
+               "name" : "Ujjwal Karn"
+            },
+            {
+               "name" : "Vedanuj Goswami"
+            },
+            {
+               "name" : "Vibhor Gupta"
+            },
+            {
+               "name" : "Vignesh Ramanathan"
+            },
+            {
+               "name" : "Viktor Kerkez"
+            },
+            {
+               "name" : "Vinay Satish Kumar"
+            },
+            {
+               "name" : "Vincent Gonguet"
+            },
+            {
+               "name" : "Vish Vogeti"
+            },
+            {
+               "name" : "Vlad Poenaru"
+            },
+            {
+               "name" : "Vlad Tiberiu Mihailescu"
+            },
+            {
+               "name" : "Vladan Petrovic"
+            },
+            {
+               "name" : "Vladimir Ivanov"
+            },
+            {
+               "name" : "Wei Li"
+            },
+            {
+               "name" : "Weiwei Chu"
+            },
+            {
+               "name" : "Wenhan Xiong"
+            },
+            {
+               "name" : "Wenyin Fu"
+            },
+            {
+               "name" : "Wes Bouaziz"
+            },
+            {
+               "name" : "Whitney Meers"
+            },
+            {
+               "name" : "Will Constable"
+            },
+            {
+               "name" : "Xavier Martinet"
+            },
+            {
+               "name" : "Xiaojian Wu"
+            },
+            {
+               "name" : "Xinbo Gao"
+            },
+            {
+               "name" : "Xinfeng Xie"
+            },
+            {
+               "name" : "Xuchao Jia"
+            },
+            {
+               "name" : "Yaelle Goldschlag"
+            },
+            {
+               "name" : "Yann LeCun"
+            },
+            {
+               "name" : "Yashesh Gaur"
+            },
+            {
+               "name" : "Yasmine Babaei"
+            },
+            {
+               "name" : "Ye Qi"
+            },
+            {
+               "name" : "Yenda Li"
+            },
+            {
+               "name" : "Yi Wen"
+            },
+            {
+               "name" : "Yiwen Song"
+            },
+            {
+               "name" : "Youngjin Nam"
+            },
+            {
+               "name" : "Yuchen Hao"
+            },
+            {
+               "name" : "Yuchen Zhang"
+            },
+            {
+               "name" : "Yun Wang"
+            },
+            {
+               "name" : "Yuning Mao"
+            },
+            {
+               "name" : "Yuzi He"
+            },
+            {
+               "name" : "Zacharie Delpierre Coudert"
+            },
+            {
+               "name" : "Zachary DeVito"
+            },
+            {
+               "name" : "Zahra Hankir"
+            },
+            {
+               "name" : "Zhaoduo Wen"
+            },
+            {
+               "name" : "Zheng Yan"
+            },
+            {
+               "name" : "Zhengxing Chen"
+            },
+            {
+               "name" : "Zhenyu Yang"
+            },
+            {
+               "name" : "Zoe Papakipos"
+            }
+         ],
+         "bom-ref" : "model:meta-llama/Meta-Llama-3-8B-Instruct",
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "name" : "llama3"
+               }
+            }
+         ],
+         "name" : "meta-llama/Meta-Llama-3-8B-Instruct",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 25,
+                  "location" : "minilm.py",
+                  "offset" : 5
+               },
+               {
+                  "line" : 24,
+                  "location" : "minilm.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 27,
+                  "location" : "minilm.py",
+                  "offset" : 35
+               },
+               {
+                  "line" : 27,
+                  "location" : "minilm.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF"
+            }
+         ],
+         "modelCard" : {
+            "modelParameters" : {
+               "datasets" : [
+                  {
+                     "ref" : "dataset:collaiborateorg/BioMedData"
+                  }
+               ]
+            }
+         },
+         "name" : "mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:sanchit-gandhi/whisper-medium-fleurs-lang-id",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 46
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 7,
+                  "location" : "whisper.py",
+                  "offset" : 5
+               },
+               {
+                  "line" : 6,
+                  "location" : "whisper.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "sanchit-gandhi/whisper-medium-fleurs-lang-id",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:sentence-transformers/all-mpnet-base-v2",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 5,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 29
+               },
+               {
+                  "line" : 5,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/sentence-transformers/all-mpnet-base-v2"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "Apache-2.0",
+                  "url" : "https://spdx.org/licenses/Apache-2.0.html"
+               }
+            }
+         ],
+         "modelCard" : {
+            "modelParameters" : {
+               "datasets" : [
+                  {
+                     "ref" : "dataset:code_search_net"
+                  },
+                  {
+                     "ref" : "dataset:eli5"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/PAQ_pairs"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/QQP"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/SPECTER"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/WikiAnswers"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/altlex"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/flickr30k-captions"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/sentence-compression"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/simple-wiki"
+                  },
+                  {
+                     "ref" : "dataset:flax-sentence-embeddings/stackexchange_xml"
+                  },
+                  {
+                     "ref" : "dataset:gooaq"
+                  },
+                  {
+                     "ref" : "dataset:ms_marco"
+                  },
+                  {
+                     "ref" : "dataset:multi_nli"
+                  },
+                  {
+                     "ref" : "dataset:natural_questions"
+                  },
+                  {
+                     "ref" : "dataset:s2orc"
+                  },
+                  {
+                     "ref" : "dataset:search_qa"
+                  },
+                  {
+                     "ref" : "dataset:snli"
+                  },
+                  {
+                     "ref" : "dataset:trivia_qa"
+                  },
+                  {
+                     "ref" : "dataset:wikihow"
+                  },
+                  {
+                     "ref" : "dataset:yahoo_answers_topics"
+                  }
+               ]
+            }
+         },
+         "name" : "sentence-transformers/all-mpnet-base-v2",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "pkg:anthropic",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 8,
+                  "location" : "chatbot.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 9,
+                  "location" : "chatbot.py",
+                  "offset" : 23
+               },
+               {
+                  "line" : 17,
+                  "location" : "chatbot.py",
+                  "offset" : 14
+               }
+            ]
+         },
+         "name" : "anthropic",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:diffusers",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 3,
+                  "location" : "diffusers_example.py",
+                  "offset" : 23
+               },
+               {
+                  "line" : 3,
+                  "location" : "diffusers_example.py",
+                  "offset" : 44
+               },
+               {
+                  "line" : 4,
+                  "location" : "diffusers_example.py",
+                  "offset" : 29
+               },
+               {
+                  "line" : 9,
+                  "location" : "diffusers_example.py",
+                  "offset" : 14
+               },
+               {
+                  "line" : 12,
+                  "location" : "diffusers_example.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 18,
+                  "location" : "diffusers_example.py",
+                  "offset" : 17
+               }
+            ]
+         },
+         "name" : "diffusers",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:sentence_transformers",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 1,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 35
+               },
+               {
+                  "line" : 5,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "sentence_transformers",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:torch",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 1,
+                  "location" : "diffusers_example.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 43,
+                  "location" : "diffusers_example.py",
+                  "offset" : 15
+               },
+               {
+                  "line" : 3,
+                  "location" : "minilm.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 5,
+                  "location" : "minilm.py",
+                  "offset" : 19
+               },
+               {
+                  "line" : 15,
+                  "location" : "minilm.py",
+                  "offset" : 12
+               },
+               {
+                  "line" : 15,
+                  "location" : "minilm.py",
+                  "offset" : 67
+               },
+               {
+                  "line" : 33,
+                  "location" : "minilm.py",
+                  "offset" : 6
+               },
+               {
+                  "line" : 40,
+                  "location" : "minilm.py",
+                  "offset" : 23
+               }
+            ]
+         },
+         "name" : "torch",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:transformers",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 3,
+                  "location" : "blip.py",
+                  "offset" : 26
+               },
+               {
+                  "line" : 3,
+                  "location" : "blip.py",
+                  "offset" : 52
+               },
+               {
+                  "line" : 5,
+                  "location" : "blip.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 6,
+                  "location" : "blip.py",
+                  "offset" : 9
+               },
+               {
+                  "line" : 6,
+                  "location" : "minilm.py",
+                  "offset" : 26
+               },
+               {
+                  "line" : 6,
+                  "location" : "minilm.py",
+                  "offset" : 37
+               },
+               {
+                  "line" : 24,
+                  "location" : "minilm.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 27,
+                  "location" : "minilm.py",
+                  "offset" : 9
+               },
+               {
+                  "line" : 2,
+                  "location" : "whisper.py",
+                  "offset" : 26
+               },
+               {
+                  "line" : 2,
+                  "location" : "whisper.py",
+                  "offset" : 59
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 6,
+                  "location" : "whisper.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "transformers",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "tool:smolagents.tools.DuckDuckGoSearchTool",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 1,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 15,
+                  "location" : "agent.py",
+                  "offset" : 15
+               }
+            ]
+         },
+         "name" : "smolagents.tools.DuckDuckGoSearchTool",
+         "type" : "application"
+      },
+      {
+         "bom-ref" : "tool:smolagents.tools.PythonREPLTool",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 1,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 14,
+                  "location" : "agent.py",
+                  "offset" : 13
+               }
+            ]
+         },
+         "name" : "smolagents.tools.PythonREPLTool",
+         "type" : "application"
+      }
+   ],
+   "dependencies" : [
+      {
+         "dependsOn" : [
+            "tool:smolagents.tools.DuckDuckGoSearchTool",
+            "tool:smolagents.tools.PythonREPLTool"
+         ],
+         "ref" : "agent:smolagents.agents.ZeroShotAgent"
+      },
+      {
+         "dependsOn" : [
+            "agent:smolagents.agents.ZeroShotAgent",
+            "model:Salesforce/blip-vqa-base",
+            "model:black-forest-labs/FLUX.1-dev",
+            "model:claude-3-5-sonnet-20240620",
+            "model:gpt-4",
+            "model:mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF",
+            "model:sanchit-gandhi/whisper-medium-fleurs-lang-id",
+            "model:sentence-transformers/all-mpnet-base-v2",
+            "pkg:anthropic",
+            "pkg:diffusers",
+            "pkg:sentence_transformers",
+            "pkg:torch",
+            "pkg:transformers",
+            "tool:smolagents.tools.DuckDuckGoSearchTool",
+            "tool:smolagents.tools.PythonREPLTool"
+         ],
+         "ref" : "application:Root"
+      },
+      {
+         "dependsOn" : [ "model:meta-llama/Meta-Llama-3-8B-Instruct" ],
+         "ref" : "model:ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1"
+      },
+      {
+         "dependsOn" : [ "model:ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1" ],
+         "ref" : "model:mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF"
+      }
+   ],
+   "metadata" : {
+      "manufacturer" : {
+         "name" : "Snyk",
+         "url" : [ "https://snyk.io" ]
+      }
+   },
+   "specVersion" : "1.6",
+   "version" : 1
+}
+

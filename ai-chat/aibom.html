@@ -1,0 +1,3268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Snyk AI BOM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.32.0/cytoscape.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+  <script src="https://unpkg.com/cytoscape-dagre/cytoscape-dagre.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Space Grotesk", sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2,
+    h3,
+    button {
+      font-family: "Space Grotesk", sans-serif;
+      white-space: nowrap;
+    }
+
+    a {
+      color: #3393f2;
+    }
+
+    a:hover {
+      text-decoration: none;
+    }
+
+    a:active {
+      color: #194775;
+    }
+
+    #top-section {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      box-shadow: #000 0px 0px 16px;
+      z-index: 1;
+    }
+
+    #controls-panel {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      z-index: 2;
+      float: left;
+      overflow: none;
+    }
+
+    #controls-panel header {
+      display: flex;
+      line-height: 52px;
+      color: #fff;
+      margin-right: 20px;
+      float: left;
+    }
+
+    #controls-panel header img {
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    #controls-panel .controls {
+      float: left;
+      margin-right: 20px;
+    }
+
+    #controls-panel button {
+      font-size: 1em;
+      margin-top: 5px;
+      margin-left: 20px;
+      padding: 0 8px;
+      line-height: 40px;
+      display: block;
+      width: 100%;
+      cursor: pointer;
+      color: #fff;
+      background: transparent;
+    }
+
+    #legend {
+      float: left;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 2px 14px;
+      margin-top: 5px;
+      margin-left: 20px;
+    }
+
+    #controls-panel button,
+    .pill,
+    #legend {
+      border: 1px #fff solid;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
+    }
+
+    #legend.active {
+      border-color: #2196f3;
+      box-shadow: 0 0 10px #2196f3;
+    }
+
+    #controls-panel button:hover,
+    #legend:hover {
+      background: rgba(4, 12, 33, 0.85);
+    }
+
+    #legend p {
+      color: #fff;
+      line-height: 35px;
+    }
+
+    #legend p::before {
+      content: "";
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      position: relative;
+      top: 3px;
+      background-repeat: no-repeat;
+      background-image: url("data:image/svg+xml,<svg viewBox='0 0 205 205' xmlns='http://www.w3.org/2000/svg'><path fill='white' d='M205.613,30.693c0-10.405-10.746-18.149-32.854-23.676C154.659,2.492,130.716,0,105.34,0C79.965,0,56.021,2.492,37.921,7.017C15.813,12.544,5.066,20.288,5.066,30.693c0,3.85,1.476,7.335,4.45,10.479l68.245,82.777v79.23c0,2.595,1.341,5.005,3.546,6.373c1.207,0.749,2.578,1.127,3.954,1.127c1.138,0,2.278-0.259,3.331-0.78l40.075-19.863c2.55-1.264,4.165-3.863,4.169-6.71l0.077-59.372l68.254-82.787C204.139,38.024,205.613,34.542,205.613,30.693z M44.94,20.767C61.467,17.048,82.917,15,105.34,15s43.874,2.048,60.399,5.767c18.25,4.107,23.38,8.521,24.607,9.926c-1.228,1.405-6.357,5.819-24.607,9.926c-16.525,3.719-37.977,5.767-60.399,5.767S61.467,44.338,44.94,40.62c-18.249-4.107-23.38-8.521-24.607-9.926C21.56,29.288,26.691,24.874,44.94,20.767z M119.631,116.486c-1.105,1.341-1.711,3.023-1.713,4.761l-0.075,57.413l-25.081,12.432v-69.835c0-1.741-0.605-3.428-1.713-4.771L40.306,54.938C58.1,59.1,81.058,61.387,105.34,61.387c24.283,0,47.24-2.287,65.034-6.449L119.631,116.486z'/></svg>");
+    }
+
+    #legend #legend-components {
+      display: none;
+      padding-bottom: 5px;
+    }
+
+    #legend:hover #legend-components {
+      display: block;
+    }
+
+    #legend label {
+      display: flex;
+      align-items: center;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+
+    #legend label:hover {
+      color: #fff;
+    }
+
+    #legend input {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    #legend .component-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+
+    #zoom-to-fit button::before {
+      content: "";
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-left: -7px;
+      margin-right: 8px;
+      position: relative;
+      top: 4px;
+      background-repeat: no-repeat;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    }
+
+    .pill {
+      display: flex;
+      height: 22px;
+      margin-right: 8px;
+      position: relative;
+      top: 6px;
+      background-repeat: no-repeat;
+      padding: 0 8px 0 16px;
+      align-items: center;
+      height: 40px;
+      color: #fff;
+    }
+
+    #toggle-json {
+      margin-left: 20px;
+      cursor: pointer;
+    }
+
+    #toggle-json:hover {
+      background: rgba(4, 12, 33, 0.85);
+    }
+
+    #toggle-json .switch {
+      margin-left: 16px;
+    }
+
+    #toggle-json::before {
+      content: "";
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      margin-left: -6px;
+      margin-right: 8px;
+      position: relative;
+      top: 0;
+      background-repeat: no-repeat;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='16 18 22 12 16 6'/%3E%3Cpolyline points='8 6 2 12 8 18'/%3E%3C/svg%3E");
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
+    }
+
+    input:checked+.slider {
+      background-color: #2196f3;
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px #2196f3;
+    }
+
+    input:checked+.slider:before {
+      -webkit-transform: translateX(20px);
+      -ms-transform: translateX(20px);
+      transform: translateX(20px);
+    }
+
+    .slider.round {
+      border-radius: 22px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+
+    #cy {
+      flex: 1;
+      min-width: 0;
+      background-size: cover;
+      background-color: rgba(4, 12, 33, 0.85);
+      position: relative;
+      min-height: 400px;
+      cursor: grab;
+    }
+
+    #json-container {
+      height: 0;
+      position: relative;
+      width: 100%;
+      transition: all 0.3s;
+    }
+
+    #json-container.expanded {
+      height: 300px;
+    }
+
+    #json-container .CodeMirror {
+      padding-top: 8px;
+    }
+
+    #component-panel {
+      width: 18%;
+      min-width: 18%;
+      max-width: 45%;
+      background-color: rgba(4, 12, 33, 0.9);
+      color: rgba(255, 255, 255, 0.85);
+      border: 1px #fff solid;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
+      border-radius: 20px;
+      padding: 0 32px;
+      display: none;
+      overflow: auto;
+      position: absolute;
+      right: 0;
+      margin: 40px 32px;
+      max-height: 90%;
+    }
+
+    #component-panel::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 20px;
+      height: 100%;
+      cursor: ew-resize;
+    }
+
+    #component-panel h3 {
+      font-size: 1.5em;
+      line-height: 30px;
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+
+    #component-details {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    #component-details ul {
+      margin-bottom: 20px;
+    }
+
+    #component-details ul li {
+      list-style: none;
+    }
+
+    #component-details dt {
+      font-weight: bold;
+      float: left;
+      margin-right: 0.4em;
+    }
+
+    #component-details dt:after {
+      content: ":";
+    }
+
+    #component-details h4 {
+      font-size: 1.3em;
+      margin-top: 20px;
+      margin-bottom: 5px;
+    }
+
+    #component-details ul {
+      list-style-type: circle;
+      margin-bottom: 0;
+      line-height: 1.5em;
+    }
+
+    #component-details .attr-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 32px;
+    }
+
+    #component-details .attr-group:first-child {
+      border-top: none;
+      padding-top: 8px;
+    }
+
+    #component-details .attr-group-attr {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #component-details .attr-group-attr-key {
+      display: flex;
+      flex-direction: column;
+      font-size: small;
+      color: rgba(255, 255, 255, 0.55);
+      font-weight: bolder;
+      padding-bottom: 2px;
+    }
+
+    #component-details .attr-group-attr-value {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #component-details .CodeMirror {
+      padding: 8px;
+    }
+
+    .CodeMirror {
+      height: 100%;
+      width: 100%;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    #error {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 0, 0, 0.1);
+      color: #d32f2f;
+      padding: 20px;
+      border-radius: 4px;
+      text-align: center;
+      font-family: "Space Grotesk", sans-serif;
+      display: none;
+    }
+  </style>
+  <script>
+    function error(...messages) {
+      const err = document.getElementById("error");
+      err.style.display = "block";
+      err.innerHTML = messages.join(" ");
+      console.error(...messages);
+      clearGraph();
+    }
+
+    function getColor(type) {
+      const colors = {
+        data: "#3393F2",
+        library: "#CC65FF",
+        "machine-learning-model": "#32D74B",
+        agent: "#11FFF8",
+        tool: "#FF9F0A",
+        prompt: "#5856D6",
+      };
+      return colors[type] || "#fff";
+    }
+
+    function getLabel(type) {
+      // CycloneDX component types
+      const labels = {
+        application: "Application",
+        framework: "Framework",
+        library: "Library",
+        "operating-system": "Operating System",
+        device: "Device",
+        file: "File",
+        container: "Container",
+        firmware: "Firmware",
+        "device-driver": "Device driver",
+        platform: "Platform",
+        "machine-learning-model": "Model",
+        data: "Dataset",
+        "cryptographic-asset": "Cryptographic asset",
+      };
+      // Domain-specific types
+      const aiLabels = {
+        agent: "Agent",
+        tool: "Tool",
+        prompt: "Prompt",
+      };
+      return (
+        labels[type] ||
+        aiLabels[type] ||
+        (type ? type.charAt(0).toUpperCase() + type.slice(1) : type)
+      );
+    }
+
+    function getNodeId(component) {
+      return component["bom-ref"] ?? `${component.type}-${component.name}`;
+    }
+
+    function componentToType(component) {
+      const id = component.id ?? component["bom-ref"] ?? "";
+      if (id.startsWith("tool:")) {
+        return "tool";
+      }
+      if (id.startsWith("agent:")) {
+        return "agent";
+      }
+      if (id.startsWith("prompt:")) {
+        return "prompt";
+      }
+      return component.type;
+    }
+
+    let cy;
+
+    function clearGraph() {
+      if (cy) {
+        cy.elements().remove();
+        cy = null;
+        document.getElementById("zoom-to-fit").style.display = "none";
+        document.getElementById("legend").style.display = "none";
+      }
+    }
+
+    function getNodes(bom) {
+      return (bom.components || []).map((component) => ({
+        data: {
+          id: getNodeId(component),
+          label: component.version
+            ? `${component.name}@${component.version}`
+            : component.name,
+          type: componentToType(component),
+        },
+      }));
+    }
+
+    function getEdges(bom, nodes) {
+      const edges = [];
+
+      const knownNodeIds = new Set();
+      for (const node of nodes || []) {
+        knownNodeIds.add(node.data.id);
+      }
+
+      for (const source of bom.dependencies || []) {
+        if (!knownNodeIds.has(source.ref)) {
+          continue;
+        }
+
+        source.dependsOn?.forEach((target) => {
+          if (!knownNodeIds.has(target)) {
+            return;
+          }
+          edges.push({ data: { source: source["ref"], target } });
+        });
+
+        source.provides?.forEach((target) => {
+          if (!knownNodeIds.has(target)) {
+            return;
+          }
+          edges.push({ data: { source: source["ref"], target } });
+        });
+      }
+
+      for (const component of bom.components || []) {
+        const nodeId = getNodeId(component);
+        if (!nodeId || !knownNodeIds.has(nodeId)) {
+          continue;
+        }
+        if (component.modelCard?.modelParameters?.datasets) {
+          component.modelCard.modelParameters.datasets.forEach((dataset) => {
+            if (!dataset.ref || !knownNodeIds.has(dataset.ref)) {
+              return;
+            }
+            edges.push({ data: { source: nodeId, target: dataset.ref } });
+          });
+        }
+      }
+
+      return edges;
+    }
+
+    function initCytoscape(bom) {
+      const nodes = getNodes(bom);
+      const edges = getEdges(bom, nodes);
+      return cytoscape({
+        container: document.getElementById("cy"),
+        layout: {
+          name: "dagre",
+          directed: true,
+          nodeDimensionsIncludeLabels: true,
+          nodeSep: 5,
+          ranker: "longest-path",
+        },
+        elements: { nodes, edges },
+        style: [
+          {
+            selector: "core",
+            style: {
+              "active-bg-size": "0",
+            },
+          },
+          {
+            selector: "node",
+            style: {
+              label: "data(label)",
+              content: "data(label)",
+              "font-size": "16px",
+              "font-family": "Space Grotesk",
+              "text-valign": "bottom",
+              "text-halign": "center",
+              shape: "round-rectangle",
+              width: "40px",
+              height: "40px",
+              "text-margin-y": "10px",
+              color: "#fff",
+              "background-color": (component) => getColor(componentToType(component.data())),
+              "border-color": "#000000",
+              "border-opacity": "0.25",
+              "border-width": 3,
+              "text-background-color": "rgba(9, 17, 37)",
+              "text-background-opacity": "1",
+              "text-background-shape": "round-rectangle",
+              "text-background-padding": "4px",
+              "text-max-width": "120px",
+              "text-wrap": "ellipsis",
+              "text-border-color": "rgba(9, 17, 37)",
+              "text-border-width": "2px",
+              "text-border-opacity": "1",
+            },
+          },
+          {
+            selector: "node.hovered",
+            style: {
+              "border-color": "#fff",
+              "border-opacity": "1",
+              "text-max-width": "999px",
+              "z-index": "999",
+              "text-border-color": "#fff",
+            },
+          },
+          {
+            selector: "node:selected",
+            style: {
+              "border-color": "rgba(255, 255, 255, 1)",
+              "border-opacity": "1",
+              "text-max-width": "999px",
+              "z-index": "999",
+              "text-border-color": "#fff",
+            },
+          },
+          {
+            selector: "edge",
+            style: {
+              width: "2",
+              "line-color": "#B0BEC5",
+              "curve-style": "bezier",
+              "target-arrow-shape": "triangle",
+              "target-arrow-color": "#B0BEC5",
+            },
+          },
+        ],
+        minZoom: 0.1,
+        maxZoom: 2.0,
+        userZoomingEnabled: true,
+        userPanningEnabled: true,
+        boxSelectionEnabled: true,
+      });
+    }
+
+    function updateGraph(bom) {
+      cy = initCytoscape(bom);
+
+      document.getElementById("zoom-to-fit").style.display = "block";
+
+      cy.on("tap", "node", (evt) => {
+        const component = bom.components.find(
+          (c) => getNodeId(c) === evt.target.id()
+        );
+
+        document.getElementById("component-panel").style.display = "block";
+
+        const detailsDiv = document.getElementById("component-details");
+        detailsDiv.innerHTML = "";
+
+        function attrPair(key, value) {
+          return `<div class="attr-group-attr"><div class="attr-group-attr-key">${key}</div><div class="attr-group-attr-value">${value}</div></div>`;
+        }
+
+        let general = `<div class="attr-group">`;
+
+        if (component.type) {
+          general += attrPair("Type", getLabel(componentToType(component)));
+        }
+
+        if (component.name) {
+          general += attrPair("Name", component.name);
+        }
+
+        if (component.version) {
+          general += attrPair("Version", component.version);
+        }
+
+        if (component.publisher) {
+          general += attrPair("Publisher", component.publisher);
+        }
+
+        if (component.supplier && component.supplier.name) {
+          const supplier = component.supplier.url ? `<a href="${component.supplier.url}" target="_blank">${component.supplier.name}</a>` : component.supplier.name;
+          general += attrPair("Supplier", supplier);
+        }
+
+        if (component.manufacturer && component.manufacturer.name) {
+          const manufacturer = component.manufacturer.url ? `<a href="${component.manufacturer.url}" target="_blank">${component.manufacturer.name}</a>` : component.manufacturer.name;
+          general += attrPair("Manufacturer", manufacturer);
+        }
+
+        general += "</div>";
+
+        detailsDiv.innerHTML += general;
+
+        for (const key in component) {
+          const value = component[key];
+          switch (key) {
+            case "bom-ref":
+            case "name":
+            case "version":
+            case "type":
+            case "publisher":
+            case "supplier":
+            case "manufacturer":
+            case "modelCard":
+              break;
+
+            case "authors": {
+              let authors = `<div class="attr-group"><div class="attr-group-attr"><div class="attr-group-attr-key">Authors</div><ul>`;
+              for (const author of value) {
+                if (author.email) {
+                  authors += `<li><a href="mailto:${author.email}" target="_blank">${author.name}</a></li>`;
+                } else {
+                  authors += `<li>${author.name}</li>`;
+                }
+              }
+              authors += "</ul></div></div>";
+              detailsDiv.innerHTML += authors;
+              break;
+            }
+
+            case "licenses": {
+              let licenses = `<div class="attr-group"><div class="attr-group-attr"><div class="attr-group-attr-key">Licenses</div><ul>`;
+              for (const license of value) {
+                const name = license?.license?.id || license?.license?.name;
+                if (name) {
+                  if (license?.license?.url) {
+                    licenses += `<li><a href="${license.license.url}" target="_blank">${name}</a></li>`;
+                  } else {
+                    licenses += `<li>${name}</li>`;
+                  }
+                }
+              }
+              licenses += "</ul></div></div>";
+              detailsDiv.innerHTML += licenses;
+              break;
+            }
+
+            case "externalReferences": {
+              let externalReferences = `<div class="attr-group"><div class="attr-group-attr"><div class="attr-group-attr-key">External references</div><ul>`;
+              for (const reference of value) {
+                if (reference.url) {
+                  externalReferences += `<li><a href="${reference.url}" target="_blank">${reference.url}</a></li>`;
+                }
+              }
+              externalReferences += "</ul></div></div>";
+              detailsDiv.innerHTML += externalReferences;
+              break;
+            }
+
+            case "evidence": {
+              if (value.occurrences) {
+                let occurrences = `<div class="attr-group"><div class="attr-group-attr"><div class="attr-group-attr-key">Occurrences</div><ul>`;
+                for (const occurrence of value.occurrences) {
+                  if (occurrence.location) {
+                    let occ = `${occurrence.location}`;
+                    if (occurrence.line) {
+                      occ += `, line ${occurrence.line}`;
+                    }
+                    if (occurrence.offset) {
+                      occ += `, column ${occurrence.offset}`;
+                    }
+                    occurrences += `<li>${occ}</li>`;
+                  }
+                }
+                occurrences += "</ul></div></div>";
+                detailsDiv.innerHTML += occurrences;
+              }
+              break;
+            }
+
+            case "properties": {
+              let properties = '<div class="attr-group"><div class="attr-group-attr-key">Properties</div>';
+              for (const prop of value) {
+                if (prop.name && prop.value) {
+                  properties += attrPair(prop.name, prop.value);
+                }
+              }
+              properties += "</div>";
+              detailsDiv.innerHTML += properties;
+              break;
+            }
+
+            default:
+              console.warn(`Unknown property ${key} in component ${component.name}`);
+          }
+        }
+      });
+
+      // Add background click handler to close panel
+      cy.on("tap", function (evt) {
+        // Only close if clicking on the background (not on a node)
+        if (evt.target === cy || evt.target.isEdge()) {
+          closeComponentPanel();
+        }
+      });
+
+      // Drag successor nodes together with the parent node
+      let offsets = {};
+      cy.on("grab", "node", (event) => {
+        const node = event.target;
+        for (const successor of node.successors().nodes()) {
+          offsets[successor.id()] = {
+            x: successor.position().x - node.position().x,
+            y: successor.position().y - node.position().y,
+          };
+        }
+      });
+
+      cy.on("drag", "node", (event) => {
+        const node = event.target;
+        for (const successor of node.successors().nodes()) {
+          successor.position({
+            x: node.position().x + offsets[successor.id()].x,
+            y: node.position().y + offsets[successor.id()].y,
+          });
+        }
+        cy.container().style.cursor = "grabbing";
+      });
+
+      cy.on("mousedown", (e) => {
+        cy.container().style.cursor =
+          e.target === cy ? "grabbing" : "pointer";
+      });
+
+      cy.on("mouseup", (e) => {
+        cy.container().style.cursor = e.target === cy ? "grab" : "pointer";
+      });
+
+      cy.on("mouseover", "node", (e) => {
+        cy.container().style.cursor = "pointer";
+        e.target.addClass("hovered");
+      });
+
+      cy.on("mouseout", "node", (e) => {
+        cy.container().style.cursor = "grab";
+        e.target.removeClass("hovered");
+      });
+    }
+
+    function updateLegend() {
+      if (!cy) {
+        return;
+      }
+
+      document.getElementById("legend").style.display = "block";
+
+      const legend = document.getElementById("legend-components");
+      legend.innerHTML = "";
+
+      const types = cy.nodes().map((node) => node.data("type"));
+      for (const type of [...new Set(types)].sort()) {
+        const label = document.createElement("label");
+        legend.appendChild(label);
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = true;
+        label.appendChild(checkbox);
+
+        checkbox.addEventListener("change", function () {
+          const nodes = cy.nodes(`[type="${type}"]`);
+          const edges = cy
+            .edges()
+            .filter(
+              (edge) => nodes.has(edge.source()) || nodes.has(edge.target())
+            );
+          if (this.checked) {
+            nodes.show();
+            edges.show();
+          } else {
+            nodes.hide();
+            edges.hide();
+          }
+
+          const checkboxes = [...document.querySelectorAll("#legend input")];
+          if (checkboxes.every((input) => input.checked)) {
+            document.getElementById("legend").classList.remove("active");
+          } else {
+            document.getElementById("legend").classList.add("active");
+          }
+
+          zoomToFit();
+        });
+
+        const icon = document.createElement("div");
+        icon.className = "component-icon";
+        icon.style.backgroundColor = getColor(type);
+        label.appendChild(icon);
+
+        const span = document.createElement("span");
+        span.innerHTML = getLabel(type);
+
+        label.appendChild(span);
+      }
+    }
+
+    function closeComponentPanel() {
+      document.getElementById("component-panel").style.display = "none";
+      cy.nodes().removeClass("hovered");
+    }
+
+    function zoomToFit() {
+      if (cy) {
+        cy.fit(50);
+      }
+    }
+
+    function update(json) {
+      document.getElementById("error").style.display = "none";
+      document.getElementById("error").innerHTML = "";
+      clearGraph();
+
+      if (json.trim().length === 0) {
+        return;
+      }
+
+      let bom;
+      try {
+        bom = JSON.parse(json);
+      } catch (e) {
+        error("Error parsing JSON:", e);
+        return;
+      }
+
+      try {
+        updateGraph(bom);
+      } catch (e) {
+        error("Internal error:", e);
+      }
+
+      updateLegend();
+    }
+
+    function makeComponentsPanelResizable() {
+      let componentPanelPos;
+      function resize(e) {
+        const componentPanel = document.getElementById("component-panel");
+        const dx = componentPanelPos - e.x;
+        componentPanelPos = e.x;
+        componentPanel.style.width =
+          parseInt(getComputedStyle(componentPanel, "").width) + dx + "px";
+      }
+
+      document.getElementById("component-panel").addEventListener(
+        "mousedown",
+        function (e) {
+          if (e.offsetX < 20) {
+            componentPanelPos = e.x;
+            document.addEventListener("mousemove", resize, false);
+          }
+        },
+        false
+      );
+
+      document.addEventListener(
+        "mouseup",
+        () => document.removeEventListener("mousemove", resize, false),
+        false
+      );
+    }
+
+    function toggleJSON() {
+      const jsonContainer = document.getElementById("json-container");
+      const toggleJsonCheckbox = document.getElementById("toggle-json-checkbox");
+      if (!jsonContainer.className) {
+        jsonContainer.className = "expanded";
+        toggleJsonCheckbox.checked = true;
+      } else {
+        jsonContainer.className = "";
+        toggleJsonCheckbox.checked = false;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+      await document.fonts.ready;
+
+      makeComponentsPanelResizable();
+
+      const editor = CodeMirror.fromTextArea(
+        document.getElementById("json-input"),
+        {
+          mode: "application/json",
+          theme: "dracula",
+          lineNumbers: true,
+          readOnly: true,
+        }
+      );
+
+      editor.on("change", () => update(editor.getValue()));
+      update(editor.getValue());
+    });
+  </script>
+</head>
+
+<body>
+  <div id="top-section">
+    <div id="controls-panel">
+      <header>
+        <a href="https://snyk.io" target="_blank"><img
+            src="https://res.cloudinary.com/snyk/image/upload/snyk-mktg-brandui/brand-logos/default-solid-dark.svg" /></a>
+        <h2>AI BOM</h2>
+      </header>
+      <div id="legend">
+        <p>Show AI components</p>
+        <div id="legend-components"></div>
+      </div>
+      <div class="controls" id="zoom-to-fit">
+        <button onclick="zoomToFit()">Zoom to fit</button>
+      </div>
+      <div class="controls pill" id="toggle-json" onclick="toggleJSON()">
+        Show JSON
+        <label class="switch">
+          <input type="checkbox" id="toggle-json-checkbox" onclick="toggleJSON()" />
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+    <div id="cy"></div>
+    <div id="error"></div>
+    <div id="component-panel">
+      <h3>AI component details</h3>
+      <div id="component-details"></div>
+    </div>
+  </div>
+  <div id="json-container">
+    <textarea id="json-input">{
+   "$schema" : "https://cyclonedx.org/schema/bom-1.6.schema.json",
+   "bomFormat" : "CycloneDX",
+   "components" : [
+      {
+         "bom-ref" : "agent:smolagents.agents.ZeroShotAgent",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 1,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 19,
+                  "location" : "agent.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "smolagents.agents.ZeroShotAgent",
+         "type" : "application"
+      },
+      {
+         "bom-ref" : "application:Root",
+         "name" : "Root",
+         "type" : "application"
+      },
+      {
+         "bom-ref" : "dataset:code_search_net",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/code_search_net"
+            }
+         ],
+         "name" : "code_search_net",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:collaiborateorg/BioMedData",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/collaiborateorg/BioMedData"
+            },
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/collaiborateorg/BioMedData"
+            }
+         ],
+         "name" : "collaiborateorg/BioMedData",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:eli5",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/eli5"
+            }
+         ],
+         "name" : "eli5",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/PAQ_pairs",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/PAQ_pairs"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/PAQ_pairs",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/QQP",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/QQP"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/QQP",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/SPECTER",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/SPECTER"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/SPECTER",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/WikiAnswers",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/WikiAnswers"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/WikiAnswers",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/altlex",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/altlex"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/altlex",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/flickr30k-captions",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/flickr30k-captions"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/flickr30k-captions",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/sentence-compression",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/sentence-compression"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/sentence-compression",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:embedding-data/simple-wiki",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/embedding-data/simple-wiki"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "embedding-data/simple-wiki",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:flax-sentence-embeddings/stackexchange_xml",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/flax-sentence-embeddings/stackexchange_xml"
+            }
+         ],
+         "name" : "flax-sentence-embeddings/stackexchange_xml",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:gooaq",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/gooaq"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "Apache-2.0",
+                  "url" : "https://spdx.org/licenses/Apache-2.0.html"
+               }
+            }
+         ],
+         "name" : "gooaq",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:ms_marco",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/ms_marco"
+            }
+         ],
+         "name" : "ms_marco",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:multi_nli",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/multi_nli"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "CC-BY-3.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-3.0.html"
+               }
+            },
+            {
+               "license" : {
+                  "id" : "CC-BY-SA-3.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-SA-3.0.html"
+               }
+            },
+            {
+               "license" : {
+                  "id" : "MIT",
+                  "url" : "https://spdx.org/licenses/MIT.html"
+               }
+            }
+         ],
+         "name" : "multi_nli",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:natural_questions",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/natural_questions"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "CC-BY-SA-3.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-SA-3.0.html"
+               }
+            }
+         ],
+         "name" : "natural_questions",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:s2orc",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/s2orc"
+            }
+         ],
+         "name" : "s2orc",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:search_qa",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/search_qa"
+            }
+         ],
+         "name" : "search_qa",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:snli",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/snli"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "CC-BY-SA-4.0",
+                  "url" : "https://spdx.org/licenses/CC-BY-SA-4.0.html"
+               }
+            }
+         ],
+         "name" : "snli",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:trivia_qa",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/trivia_qa"
+            }
+         ],
+         "name" : "trivia_qa",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:wikihow",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/wikihow"
+            }
+         ],
+         "name" : "wikihow",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "bom-ref" : "dataset:yahoo_answers_topics",
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://huggingface.co/datasets/yahoo_answers_topics"
+            }
+         ],
+         "name" : "yahoo_answers_topics",
+         "publisher" : "Hugging Face Inc",
+         "type" : "data"
+      },
+      {
+         "authors" : [
+            {
+               "name" : "ContactDoctor"
+            }
+         ],
+         "bom-ref" : "model:ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1",
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1"
+            }
+         ],
+         "modelCard" : {
+            "modelParameters" : {
+               "datasets" : [
+                  {
+                     "ref" : "dataset:collaiborateorg/BioMedData"
+                  }
+               ]
+            }
+         },
+         "name" : "ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "authors" : [
+            {
+               "name" : "Junnan Li"
+            },
+            {
+               "name" : "Dongxu Li"
+            },
+            {
+               "name" : "Caiming Xiong"
+            },
+            {
+               "name" : "Steven Hoi"
+            }
+         ],
+         "bom-ref" : "model:Salesforce/blip-vqa-base",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 5,
+                  "location" : "blip.py",
+                  "offset" : 43
+               },
+               {
+                  "line" : 5,
+                  "location" : "blip.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 6,
+                  "location" : "blip.py",
+                  "offset" : 50
+               },
+               {
+                  "line" : 6,
+                  "location" : "blip.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/Salesforce/blip-vqa-base"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "BSD-3-Clause",
+                  "url" : "https://spdx.org/licenses/BSD-3-Clause.html"
+               }
+            }
+         ],
+         "name" : "Salesforce/blip-vqa-base",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:black-forest-labs/FLUX.1-dev",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.5,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 6,
+                  "location" : "diffusers_example.py",
+                  "offset" : 14
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/black-forest-labs/FLUX.1-dev"
+            }
+         ],
+         "name" : "black-forest-labs/FLUX.1-dev",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:claude-3-5-sonnet-20240620",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 18,
+                  "location" : "chatbot.py",
+                  "offset" : 20
+               },
+               {
+                  "line" : 27,
+                  "location" : "chatbot.py",
+                  "offset" : 20
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://docs.anthropic.com/en/docs/about-claude/models/all-models#model-comparison-table"
+            }
+         ],
+         "manufacturer" : {
+            "name" : "Anthropic PBC",
+            "url" : [ "https://www.anthropic.com" ]
+         },
+         "name" : "claude-3-5-sonnet-20240620",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:gpt-4",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 11,
+                  "location" : "agent.py",
+                  "offset" : 70
+               },
+               {
+                  "line" : 11,
+                  "location" : "agent.py",
+                  "offset" : 7
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "website",
+               "url" : "https://platform.openai.com/docs/models/gpt-4"
+            }
+         ],
+         "manufacturer" : {
+            "name" : "OpenAI, Inc.",
+            "url" : [ "https://openai.com" ]
+         },
+         "name" : "gpt-4",
+         "type" : "machine-learning-model"
+      },
+      {
+         "authors" : [
+            {
+               "name" : "Aaditya Singh"
+            },
+            {
+               "name" : "Aaron Grattafiori"
+            },
+            {
+               "name" : "Abhimanyu Dubey"
+            },
+            {
+               "name" : "Abhinav Jauhri"
+            },
+            {
+               "name" : "Abhinav Pandey"
+            },
+            {
+               "name" : "Abhishek Kadian"
+            },
+            {
+               "name" : "Adam Kelsey"
+            },
+            {
+               "name" : "Adi Gangidi"
+            },
+            {
+               "name" : "Ahmad Al-Dahle"
+            },
+            {
+               "name" : "Ahuva Goldstand"
+            },
+            {
+               "name" : "Aiesha Letman"
+            },
+            {
+               "name" : "Ajay Menon"
+            },
+            {
+               "name" : "Akhil Mathur"
+            },
+            {
+               "name" : "Alan Schelten"
+            },
+            {
+               "name" : "Alex Vaughan"
+            },
+            {
+               "name" : "Amy Yang"
+            },
+            {
+               "name" : "Andrei Lupu"
+            },
+            {
+               "name" : "Andres Alvarado"
+            },
+            {
+               "name" : "Andrew Gallagher"
+            },
+            {
+               "name" : "Andrew Gu"
+            },
+            {
+               "name" : "Andrew Ho"
+            },
+            {
+               "name" : "Andrew Poulton"
+            },
+            {
+               "name" : "Andrew Ryan"
+            },
+            {
+               "name" : "Angela Fan"
+            },
+            {
+               "name" : "Ankit Ramchandani"
+            },
+            {
+               "name" : "Anthony Hartshorn"
+            },
+            {
+               "name" : "Archi Mitra"
+            },
+            {
+               "name" : "Archie Sravankumar"
+            },
+            {
+               "name" : "Artem Korenev"
+            },
+            {
+               "name" : "Arun Rao"
+            },
+            {
+               "name" : "Ashley Gabriel"
+            },
+            {
+               "name" : "Ashwin Bharambe"
+            },
+            {
+               "name" : "Assaf Eisenman"
+            },
+            {
+               "name" : "Aston Zhang"
+            },
+            {
+               "name" : "Aurelien Rodriguez"
+            },
+            {
+               "name" : "Austen Gregerson"
+            },
+            {
+               "name" : "Ava Spataru"
+            },
+            {
+               "name" : "Baptiste Roziere"
+            },
+            {
+               "name" : "Ben Maurer"
+            },
+            {
+               "name" : "Benjamin Leonhardi"
+            },
+            {
+               "name" : "Bernie Huang"
+            },
+            {
+               "name" : "Bhargavi Paranjape"
+            },
+            {
+               "name" : "Bing Liu"
+            },
+            {
+               "name" : "Binh Tang"
+            },
+            {
+               "name" : "Bobbie Chern"
+            },
+            {
+               "name" : "Brani Stojkovic"
+            },
+            {
+               "name" : "Brian Fuller"
+            },
+            {
+               "name" : "Catalina Mejia Arenas"
+            },
+            {
+               "name" : "Chao Zhou"
+            },
+            {
+               "name" : "Charlotte Caucheteux"
+            },
+            {
+               "name" : "Chaya Nayak"
+            },
+            {
+               "name" : "Ching-Hsiang Chu"
+            },
+            {
+               "name" : "Chloe Bi"
+            },
+            {
+               "name" : "Chris Cai"
+            },
+            {
+               "name" : "Chris Cox"
+            },
+            {
+               "name" : "Chris Marra"
+            },
+            {
+               "name" : "Chris McConnell"
+            },
+            {
+               "name" : "Christian Keller"
+            },
+            {
+               "name" : "Christoph Feichtenhofer"
+            },
+            {
+               "name" : "Christophe Touret"
+            },
+            {
+               "name" : "Chunyang Wu"
+            },
+            {
+               "name" : "Corinne Wong"
+            },
+            {
+               "name" : "Cristian Canton Ferrer"
+            },
+            {
+               "name" : "Damien Allonsius"
+            },
+            {
+               "name" : "Daniel Kreymer"
+            },
+            {
+               "name" : "Daniel Haziza"
+            },
+            {
+               "name" : "Daniel Li"
+            },
+            {
+               "name" : "Danielle Pintz"
+            },
+            {
+               "name" : "Danny Livshits"
+            },
+            {
+               "name" : "Danny Wyatt"
+            },
+            {
+               "name" : "David Adkins"
+            },
+            {
+               "name" : "David Esiobu"
+            },
+            {
+               "name" : "David Xu"
+            },
+            {
+               "name" : "Davide Testuggine"
+            },
+            {
+               "name" : "Delia David"
+            },
+            {
+               "name" : "Devi Parikh"
+            },
+            {
+               "name" : "Dhruv Choudhary"
+            },
+            {
+               "name" : "Dhruv Mahajan"
+            },
+            {
+               "name" : "Diana Liskovich"
+            },
+            {
+               "name" : "Diego Garcia-Olano"
+            },
+            {
+               "name" : "Diego Perino"
+            },
+            {
+               "name" : "Dieuwke Hupkes"
+            },
+            {
+               "name" : "Dingkang Wang"
+            },
+            {
+               "name" : "Dustin Holland"
+            },
+            {
+               "name" : "Egor Lakomkin"
+            },
+            {
+               "name" : "Elina Lobanova"
+            },
+            {
+               "name" : "Xiaoqing Ellen Tan"
+            },
+            {
+               "name" : "Emily Dinan"
+            },
+            {
+               "name" : "Eric Smith"
+            },
+            {
+               "name" : "Erik Brinkman"
+            },
+            {
+               "name" : "Esteban Arcaute"
+            },
+            {
+               "name" : "Filip Radenovic"
+            },
+            {
+               "name" : "Firat Ozgenel"
+            },
+            {
+               "name" : "Francesco Caggioni"
+            },
+            {
+               "name" : "Frank Seide"
+            },
+            {
+               "name" : "Frank Zhang"
+            },
+            {
+               "name" : "Gabriel Synnaeve"
+            },
+            {
+               "name" : "Gabriella Schwarz"
+            },
+            {
+               "name" : "Gabrielle Lee"
+            },
+            {
+               "name" : "Gada Badeer"
+            },
+            {
+               "name" : "Georgia Anderson"
+            },
+            {
+               "name" : "Graeme Nail"
+            },
+            {
+               "name" : "Gregoire Mialon"
+            },
+            {
+               "name" : "Guan Pang"
+            },
+            {
+               "name" : "Guillem Cucurell"
+            },
+            {
+               "name" : "Hailey Nguyen"
+            },
+            {
+               "name" : "Hannah Korevaar"
+            },
+            {
+               "name" : "Hannah Wang"
+            },
+            {
+               "name" : "Haroun Habeeb"
+            },
+            {
+               "name" : "Harrison Rudolph"
+            },
+            {
+               "name" : "Henry Aspegren"
+            },
+            {
+               "name" : "Hu Xu"
+            },
+            {
+               "name" : "Hugo Touvron"
+            },
+            {
+               "name" : "Iga Kozlowska"
+            },
+            {
+               "name" : "Igor Molybog"
+            },
+            {
+               "name" : "Igor Tufanov"
+            },
+            {
+               "name" : "Iliyan Zarov"
+            },
+            {
+               "name" : "Imanol Arrieta Ibarra"
+            },
+            {
+               "name" : "Irina-Elena Veliche"
+            },
+            {
+               "name" : "Isabel Kloumann"
+            },
+            {
+               "name" : "Ishan Misra"
+            },
+            {
+               "name" : "Ivan Evtimov"
+            },
+            {
+               "name" : "Jacob Xu"
+            },
+            {
+               "name" : "Jade Copet"
+            },
+            {
+               "name" : "Jake Weissman"
+            },
+            {
+               "name" : "Jan Geffert"
+            },
+            {
+               "name" : "Jana Vranes"
+            },
+            {
+               "name" : "Japhet Asher"
+            },
+            {
+               "name" : "Jason Park"
+            },
+            {
+               "name" : "Jay Mahadeokar"
+            },
+            {
+               "name" : "Jean-Baptiste Gaya"
+            },
+            {
+               "name" : "Jeet Shah"
+            },
+            {
+               "name" : "Jelmer van der Linde"
+            },
+            {
+               "name" : "Jennifer Chan"
+            },
+            {
+               "name" : "Jenny Hong"
+            },
+            {
+               "name" : "Jenya Lee"
+            },
+            {
+               "name" : "Jeremy Fu"
+            },
+            {
+               "name" : "Jeremy Teboul"
+            },
+            {
+               "name" : "Jianfeng Chi"
+            },
+            {
+               "name" : "Jianyu Huang"
+            },
+            {
+               "name" : "Jie Wang"
+            },
+            {
+               "name" : "Jiecao Yu"
+            },
+            {
+               "name" : "Joanna Bitton"
+            },
+            {
+               "name" : "Joe Spisak"
+            },
+            {
+               "name" : "Joelle Pineau"
+            },
+            {
+               "name" : "Jon Carvill"
+            },
+            {
+               "name" : "Jongsoo Park"
+            },
+            {
+               "name" : "Joseph Rocca"
+            },
+            {
+               "name" : "Joshua Johnstun"
+            },
+            {
+               "name" : "Junteng Jia"
+            },
+            {
+               "name" : "Kalyan Vasuden Alwala"
+            },
+            {
+               "name" : "Kam Hou U"
+            },
+            {
+               "name" : "Kate Plawiak"
+            },
+            {
+               "name" : "Kartikeya Upasani"
+            },
+            {
+               "name" : "Kaushik Veeraraghavan"
+            },
+            {
+               "name" : "Ke Li"
+            },
+            {
+               "name" : "Kenneth Heafield"
+            },
+            {
+               "name" : "Kevin Stone"
+            },
+            {
+               "name" : "Khalid El-Arini"
+            },
+            {
+               "name" : "Krithika Iyer"
+            },
+            {
+               "name" : "Kshitiz Malik"
+            },
+            {
+               "name" : "Kuenley Chiu"
+            },
+            {
+               "name" : "Kunal Bhalla"
+            },
+            {
+               "name" : "Kyle Huang"
+            },
+            {
+               "name" : "Lakshya Garg"
+            },
+            {
+               "name" : "Lauren Rantala-Yeary"
+            },
+            {
+               "name" : "Laurens van der Maaten"
+            },
+            {
+               "name" : "Lawrence Chen"
+            },
+            {
+               "name" : "Leandro Silva"
+            },
+            {
+               "name" : "Lee Bell"
+            },
+            {
+               "name" : "Lei Zhang"
+            },
+            {
+               "name" : "Liang Tan"
+            },
+            {
+               "name" : "Louis Martin"
+            },
+            {
+               "name" : "Lovish Madaan"
+            },
+            {
+               "name" : "Luca Wehrstedt"
+            },
+            {
+               "name" : "Lukas Blecher"
+            },
+            {
+               "name" : "Luke de Oliveira"
+            },
+            {
+               "name" : "Madeline Muzzi"
+            },
+            {
+               "name" : "Madian Khabsa"
+            },
+            {
+               "name" : "Manav Avlani"
+            },
+            {
+               "name" : "Mannat Singh"
+            },
+            {
+               "name" : "Manohar Paluri"
+            },
+            {
+               "name" : "Mark Zuckerberg"
+            },
+            {
+               "name" : "Marcin Kardas"
+            },
+            {
+               "name" : "Martynas Mankus"
+            },
+            {
+               "name" : "Mathew Oldham"
+            },
+            {
+               "name" : "Mathieu Rita"
+            },
+            {
+               "name" : "Matthew Lennie"
+            },
+            {
+               "name" : "Maya Pavlova"
+            },
+            {
+               "name" : "Meghan Keneally"
+            },
+            {
+               "name" : "Melanie Kambadur"
+            },
+            {
+               "name" : "Mihir Patel"
+            },
+            {
+               "name" : "Mikayel Samvelyan"
+            },
+            {
+               "name" : "Mike Clark"
+            },
+            {
+               "name" : "Mike Lewis"
+            },
+            {
+               "name" : "Min Si"
+            },
+            {
+               "name" : "Mitesh Kumar Singh"
+            },
+            {
+               "name" : "Mo Metanat"
+            },
+            {
+               "name" : "Mona Hassan"
+            },
+            {
+               "name" : "Naman Goyal"
+            },
+            {
+               "name" : "Narjes Torabi"
+            },
+            {
+               "name" : "Nicolas Usunier"
+            },
+            {
+               "name" : "Nikolay Bashlykov"
+            },
+            {
+               "name" : "Nikolay Bogoychev"
+            },
+            {
+               "name" : "Niladri Chatterji"
+            },
+            {
+               "name" : "Ning Dong"
+            },
+            {
+               "name" : "Oliver Aobo Yang"
+            },
+            {
+               "name" : "Olivier Duchenne"
+            },
+            {
+               "name" : "Onur Celebi"
+            },
+            {
+               "name" : "Parth Parekh"
+            },
+            {
+               "name" : "Patrick Alrassy"
+            },
+            {
+               "name" : "Paul Saab"
+            },
+            {
+               "name" : "Pavan Balaji"
+            },
+            {
+               "name" : "Pedro Rittner"
+            },
+            {
+               "name" : "Pengchuan Zhang"
+            },
+            {
+               "name" : "Pengwei Li"
+            },
+            {
+               "name" : "Petar Vasic"
+            },
+            {
+               "name" : "Peter Weng"
+            },
+            {
+               "name" : "Polina Zvyagina"
+            },
+            {
+               "name" : "Prajjwal Bhargava"
+            },
+            {
+               "name" : "Pratik Dubal"
+            },
+            {
+               "name" : "Praveen Krishnan"
+            },
+            {
+               "name" : "Punit Singh Koura"
+            },
+            {
+               "name" : "Qing He"
+            },
+            {
+               "name" : "Rachel Rodriguez"
+            },
+            {
+               "name" : "Ragavan Srinivasan"
+            },
+            {
+               "name" : "Rahul Mitra"
+            },
+            {
+               "name" : "Ramon Calderer"
+            },
+            {
+               "name" : "Raymond Li"
+            },
+            {
+               "name" : "Robert Stojnic"
+            },
+            {
+               "name" : "Roberta Raileanu"
+            },
+            {
+               "name" : "Robin Battey"
+            },
+            {
+               "name" : "Rocky Wang"
+            },
+            {
+               "name" : "Rohit Girdhar"
+            },
+            {
+               "name" : "Rohit Patel"
+            },
+            {
+               "name" : "Romain Sauvestre"
+            },
+            {
+               "name" : "Ronnie Polidoro"
+            },
+            {
+               "name" : "Roshan Sumbaly"
+            },
+            {
+               "name" : "Ross Taylor"
+            },
+            {
+               "name" : "Ruan Silva"
+            },
+            {
+               "name" : "Rui Hou"
+            },
+            {
+               "name" : "Rui Wang"
+            },
+            {
+               "name" : "Russ Howes"
+            },
+            {
+               "name" : "Ruty Rinott"
+            },
+            {
+               "name" : "Saghar Hosseini"
+            },
+            {
+               "name" : "Sai Jayesh Bondu"
+            },
+            {
+               "name" : "Samyak Datta"
+            },
+            {
+               "name" : "Sanjay Singh"
+            },
+            {
+               "name" : "Sara Chugh"
+            },
+            {
+               "name" : "Sargun Dhillon"
+            },
+            {
+               "name" : "Satadru Pan"
+            },
+            {
+               "name" : "Sean Bell"
+            },
+            {
+               "name" : "Sergey Edunov"
+            },
+            {
+               "name" : "Shaoliang Nie"
+            },
+            {
+               "name" : "Sharan Narang"
+            },
+            {
+               "name" : "Sharath Raparthy"
+            },
+            {
+               "name" : "Shaun Lindsay"
+            },
+            {
+               "name" : "Sheng Feng"
+            },
+            {
+               "name" : "Sheng Shen"
+            },
+            {
+               "name" : "Shenghao Lin"
+            },
+            {
+               "name" : "Shiva Shankar"
+            },
+            {
+               "name" : "Shruti Bhosale"
+            },
+            {
+               "name" : "Shun Zhang"
+            },
+            {
+               "name" : "Simon Vandenhende"
+            },
+            {
+               "name" : "Sinong Wang"
+            },
+            {
+               "name" : "Seohyun Sonia Kim"
+            },
+            {
+               "name" : "Soumya Batra"
+            },
+            {
+               "name" : "Sten Sootla"
+            },
+            {
+               "name" : "Steve Kehoe"
+            },
+            {
+               "name" : "Suchin Gururangan"
+            },
+            {
+               "name" : "Sumit Gupta"
+            },
+            {
+               "name" : "Sunny Virk"
+            },
+            {
+               "name" : "Sydney Borodinsky"
+            },
+            {
+               "name" : "Tamar Glaser"
+            },
+            {
+               "name" : "Tamar Herman"
+            },
+            {
+               "name" : "Tamara Best"
+            },
+            {
+               "name" : "Tara Fowler"
+            },
+            {
+               "name" : "Thomas Georgiou"
+            },
+            {
+               "name" : "Thomas Scialom"
+            },
+            {
+               "name" : "Tianhe Li"
+            },
+            {
+               "name" : "Todor Mihaylov"
+            },
+            {
+               "name" : "Tong Xiao"
+            },
+            {
+               "name" : "Ujjwal Karn"
+            },
+            {
+               "name" : "Vedanuj Goswami"
+            },
+            {
+               "name" : "Vibhor Gupta"
+            },
+            {
+               "name" : "Vignesh Ramanathan"
+            },
+            {
+               "name" : "Viktor Kerkez"
+            },
+            {
+               "name" : "Vinay Satish Kumar"
+            },
+            {
+               "name" : "Vincent Gonguet"
+            },
+            {
+               "name" : "Vish Vogeti"
+            },
+            {
+               "name" : "Vlad Poenaru"
+            },
+            {
+               "name" : "Vlad Tiberiu Mihailescu"
+            },
+            {
+               "name" : "Vladan Petrovic"
+            },
+            {
+               "name" : "Vladimir Ivanov"
+            },
+            {
+               "name" : "Wei Li"
+            },
+            {
+               "name" : "Weiwei Chu"
+            },
+            {
+               "name" : "Wenhan Xiong"
+            },
+            {
+               "name" : "Wenyin Fu"
+            },
+            {
+               "name" : "Wes Bouaziz"
+            },
+            {
+               "name" : "Whitney Meers"
+            },
+            {
+               "name" : "Will Constable"
+            },
+            {
+               "name" : "Xavier Martinet"
+            },
+            {
+               "name" : "Xiaojian Wu"
+            },
+            {
+               "name" : "Xinbo Gao"
+            },
+            {
+               "name" : "Xinfeng Xie"
+            },
+            {
+               "name" : "Xuchao Jia"
+            },
+            {
+               "name" : "Yaelle Goldschlag"
+            },
+            {
+               "name" : "Yann LeCun"
+            },
+            {
+               "name" : "Yashesh Gaur"
+            },
+            {
+               "name" : "Yasmine Babaei"
+            },
+            {
+               "name" : "Ye Qi"
+            },
+            {
+               "name" : "Yenda Li"
+            },
+            {
+               "name" : "Yi Wen"
+            },
+            {
+               "name" : "Yiwen Song"
+            },
+            {
+               "name" : "Youngjin Nam"
+            },
+            {
+               "name" : "Yuchen Hao"
+            },
+            {
+               "name" : "Yuchen Zhang"
+            },
+            {
+               "name" : "Yun Wang"
+            },
+            {
+               "name" : "Yuning Mao"
+            },
+            {
+               "name" : "Yuzi He"
+            },
+            {
+               "name" : "Zacharie Delpierre Coudert"
+            },
+            {
+               "name" : "Zachary DeVito"
+            },
+            {
+               "name" : "Zahra Hankir"
+            },
+            {
+               "name" : "Zhaoduo Wen"
+            },
+            {
+               "name" : "Zheng Yan"
+            },
+            {
+               "name" : "Zhengxing Chen"
+            },
+            {
+               "name" : "Zhenyu Yang"
+            },
+            {
+               "name" : "Zoe Papakipos"
+            }
+         ],
+         "bom-ref" : "model:meta-llama/Meta-Llama-3-8B-Instruct",
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "name" : "llama3"
+               }
+            }
+         ],
+         "name" : "meta-llama/Meta-Llama-3-8B-Instruct",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 25,
+                  "location" : "minilm.py",
+                  "offset" : 5
+               },
+               {
+                  "line" : 24,
+                  "location" : "minilm.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 27,
+                  "location" : "minilm.py",
+                  "offset" : 35
+               },
+               {
+                  "line" : 27,
+                  "location" : "minilm.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF"
+            }
+         ],
+         "modelCard" : {
+            "modelParameters" : {
+               "datasets" : [
+                  {
+                     "ref" : "dataset:collaiborateorg/BioMedData"
+                  }
+               ]
+            }
+         },
+         "name" : "mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:sanchit-gandhi/whisper-medium-fleurs-lang-id",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 46
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 7,
+                  "location" : "whisper.py",
+                  "offset" : 5
+               },
+               {
+                  "line" : 6,
+                  "location" : "whisper.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "sanchit-gandhi/whisper-medium-fleurs-lang-id",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "model:sentence-transformers/all-mpnet-base-v2",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 5,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 29
+               },
+               {
+                  "line" : 5,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 9
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               }
+            ]
+         },
+         "externalReferences" : [
+            {
+               "type" : "model-card",
+               "url" : "https://huggingface.co/sentence-transformers/all-mpnet-base-v2"
+            }
+         ],
+         "licenses" : [
+            {
+               "license" : {
+                  "id" : "Apache-2.0",
+                  "url" : "https://spdx.org/licenses/Apache-2.0.html"
+               }
+            }
+         ],
+         "modelCard" : {
+            "modelParameters" : {
+               "datasets" : [
+                  {
+                     "ref" : "dataset:code_search_net"
+                  },
+                  {
+                     "ref" : "dataset:eli5"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/PAQ_pairs"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/QQP"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/SPECTER"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/WikiAnswers"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/altlex"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/flickr30k-captions"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/sentence-compression"
+                  },
+                  {
+                     "ref" : "dataset:embedding-data/simple-wiki"
+                  },
+                  {
+                     "ref" : "dataset:flax-sentence-embeddings/stackexchange_xml"
+                  },
+                  {
+                     "ref" : "dataset:gooaq"
+                  },
+                  {
+                     "ref" : "dataset:ms_marco"
+                  },
+                  {
+                     "ref" : "dataset:multi_nli"
+                  },
+                  {
+                     "ref" : "dataset:natural_questions"
+                  },
+                  {
+                     "ref" : "dataset:s2orc"
+                  },
+                  {
+                     "ref" : "dataset:search_qa"
+                  },
+                  {
+                     "ref" : "dataset:snli"
+                  },
+                  {
+                     "ref" : "dataset:trivia_qa"
+                  },
+                  {
+                     "ref" : "dataset:wikihow"
+                  },
+                  {
+                     "ref" : "dataset:yahoo_answers_topics"
+                  }
+               ]
+            }
+         },
+         "name" : "sentence-transformers/all-mpnet-base-v2",
+         "publisher" : "Hugging Face Inc",
+         "type" : "machine-learning-model"
+      },
+      {
+         "bom-ref" : "pkg:anthropic",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 8,
+                  "location" : "chatbot.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 9,
+                  "location" : "chatbot.py",
+                  "offset" : 23
+               },
+               {
+                  "line" : 17,
+                  "location" : "chatbot.py",
+                  "offset" : 14
+               }
+            ]
+         },
+         "name" : "anthropic",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:diffusers",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 3,
+                  "location" : "diffusers_example.py",
+                  "offset" : 23
+               },
+               {
+                  "line" : 3,
+                  "location" : "diffusers_example.py",
+                  "offset" : 44
+               },
+               {
+                  "line" : 4,
+                  "location" : "diffusers_example.py",
+                  "offset" : 29
+               },
+               {
+                  "line" : 9,
+                  "location" : "diffusers_example.py",
+                  "offset" : 14
+               },
+               {
+                  "line" : 12,
+                  "location" : "diffusers_example.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 18,
+                  "location" : "diffusers_example.py",
+                  "offset" : 17
+               }
+            ]
+         },
+         "name" : "diffusers",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:sentence_transformers",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 1,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 35
+               },
+               {
+                  "line" : 5,
+                  "location" : "sentencetransformers.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "sentence_transformers",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:torch",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 1,
+                  "location" : "diffusers_example.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 43,
+                  "location" : "diffusers_example.py",
+                  "offset" : 15
+               },
+               {
+                  "line" : 3,
+                  "location" : "minilm.py",
+                  "offset" : 8
+               },
+               {
+                  "line" : 5,
+                  "location" : "minilm.py",
+                  "offset" : 19
+               },
+               {
+                  "line" : 15,
+                  "location" : "minilm.py",
+                  "offset" : 12
+               },
+               {
+                  "line" : 15,
+                  "location" : "minilm.py",
+                  "offset" : 67
+               },
+               {
+                  "line" : 33,
+                  "location" : "minilm.py",
+                  "offset" : 6
+               },
+               {
+                  "line" : 40,
+                  "location" : "minilm.py",
+                  "offset" : 23
+               }
+            ]
+         },
+         "name" : "torch",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "pkg:transformers",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 0.90000000000000002,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 3,
+                  "location" : "blip.py",
+                  "offset" : 26
+               },
+               {
+                  "line" : 3,
+                  "location" : "blip.py",
+                  "offset" : 52
+               },
+               {
+                  "line" : 5,
+                  "location" : "blip.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 6,
+                  "location" : "blip.py",
+                  "offset" : 9
+               },
+               {
+                  "line" : 6,
+                  "location" : "minilm.py",
+                  "offset" : 26
+               },
+               {
+                  "line" : 6,
+                  "location" : "minilm.py",
+                  "offset" : 37
+               },
+               {
+                  "line" : 24,
+                  "location" : "minilm.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 27,
+                  "location" : "minilm.py",
+                  "offset" : 9
+               },
+               {
+                  "line" : 2,
+                  "location" : "whisper.py",
+                  "offset" : 26
+               },
+               {
+                  "line" : 2,
+                  "location" : "whisper.py",
+                  "offset" : 59
+               },
+               {
+                  "line" : 5,
+                  "location" : "whisper.py",
+                  "offset" : 13
+               },
+               {
+                  "line" : 6,
+                  "location" : "whisper.py",
+                  "offset" : 9
+               }
+            ]
+         },
+         "name" : "transformers",
+         "type" : "library"
+      },
+      {
+         "bom-ref" : "tool:smolagents.tools.DuckDuckGoSearchTool",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 1,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 15,
+                  "location" : "agent.py",
+                  "offset" : 15
+               }
+            ]
+         },
+         "name" : "smolagents.tools.DuckDuckGoSearchTool",
+         "type" : "application"
+      },
+      {
+         "bom-ref" : "tool:smolagents.tools.PythonREPLTool",
+         "evidence" : {
+            "identity" : [
+               {
+                  "field" : "name",
+                  "methods" : [
+                     {
+                        "confidence" : 1,
+                        "technique" : "source-code-analysis"
+                     }
+                  ]
+               }
+            ],
+            "occurrences" : [
+               {
+                  "line" : 14,
+                  "location" : "agent.py",
+                  "offset" : 13
+               }
+            ]
+         },
+         "name" : "smolagents.tools.PythonREPLTool",
+         "type" : "application"
+      }
+   ],
+   "dependencies" : [
+      {
+         "dependsOn" : [
+            "tool:smolagents.tools.DuckDuckGoSearchTool",
+            "tool:smolagents.tools.PythonREPLTool"
+         ],
+         "ref" : "agent:smolagents.agents.ZeroShotAgent"
+      },
+      {
+         "dependsOn" : [
+            "agent:smolagents.agents.ZeroShotAgent",
+            "model:Salesforce/blip-vqa-base",
+            "model:black-forest-labs/FLUX.1-dev",
+            "model:claude-3-5-sonnet-20240620",
+            "model:gpt-4",
+            "model:mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF",
+            "model:sanchit-gandhi/whisper-medium-fleurs-lang-id",
+            "model:sentence-transformers/all-mpnet-base-v2",
+            "pkg:anthropic",
+            "pkg:diffusers",
+            "pkg:sentence_transformers",
+            "pkg:torch",
+            "pkg:transformers",
+            "tool:smolagents.tools.DuckDuckGoSearchTool",
+            "tool:smolagents.tools.PythonREPLTool"
+         ],
+         "ref" : "application:Root"
+      },
+      {
+         "dependsOn" : [ "model:meta-llama/Meta-Llama-3-8B-Instruct" ],
+         "ref" : "model:ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1"
+      },
+      {
+         "dependsOn" : [ "model:ContactDoctor/Bio-Medical-MultiModal-Llama-3-8B-V1" ],
+         "ref" : "model:mradermacher/Bio-Medical-MultiModal-Llama-3-8B-V1-i1-GGUF"
+      }
+   ],
+   "metadata" : {
+      "manufacturer" : {
+         "name" : "Snyk",
+         "url" : [ "https://snyk.io" ]
+      }
+   },
+   "specVersion" : "1.6",
+   "version" : 1
+}
+</textarea>
+  </div>
+</body>
+
+</html>
