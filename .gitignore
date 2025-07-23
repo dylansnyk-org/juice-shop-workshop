@@ -70,3 +70,4 @@ terraform.tfstate
 **/.terraform/**
 
 .dccache
+.sfdx/** 
