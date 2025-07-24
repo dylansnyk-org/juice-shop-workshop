@@ -10,7 +10,7 @@ The example prompts below may result in different outputs if you're using a diff
 
 If you experience different results than the workshop leader, try using a more specific prompt. For example, you may prompt `Scan for vulnerabilities using Snyk` and the agent may run a Snyk Code scan instead of Snyk Open Source scan like you were expecting. On the follow up prompt try prompting `Scan for vulnerabilities in my open source dependencies using Snyk Open Source` instead.
 
-## Setup - Prep the Environemnt
+## Setup - Prep the Environment
 
 ```
 # Clone this repo
