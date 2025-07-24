@@ -2,90 +2,83 @@
 
 # Snyk Juice Shop
 
-This is a vulnerable by design repository for demonstrating Snyk Insights. Do not deploy this in production.
+This is a vulnerable by design repository for demonstrating Snyk in the IDE. Do not deploy this application in production.
 
-## Step 0: Prepare Demo Environemnt
+### A note on consistency
 
-### Install Tools
+The example prompts below may result in different outputs if you're using a different model. Even the same model may return greatly different responses from time to time.
 
-- [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
-- [helm](https://helm.sh/docs/intro/install/)
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+If you experience different results than the workshop leader, try using a more specific prompt. For example, you may prompt `Scan for vulnerabilities using Snyk` and the agent may run a Snyk Code scan instead of Snyk Open Source scan like you were expecting. On the follow up prompt try prompting `Scan for vulnerabilities in my open source dependencies using Snyk Open Source` instead.
 
-### Fork & Import
-
-Fork this repository and import it in a new or existing org.
+## Setup - Prep the Environemnt
 
 ```
-git clone https://github.com/somerset-inc/juice-shop-goof.git
-cd juice-shop
+# Clone this repo
+git clone https://github.com/dylansnyk-org/juice-shop-workshop
+
+# Install the Snyk CLI
+npm install -g snyk
 ```
+- AI-IDE like Cursor, or VS Code in Agent Mode 
+  - In VS Code, search "Chat: Open Chat (Agent)"
+- Snyk [IDE Extension](https://docs.snyk.io/cli-ide-and-ci-cd-integrations/snyk-ide-plugins-and-extensions) installed
 
-### Deploy Juice Shop to EKS
-
-In A Cloud Guru create an AWS sandbox environment, then add the following as GitHub Actions Variables:
-
-```
-AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY
-SNYK_ORG_ID
-SNYK_TOKEN
-```
-
-Edit the [_build_flag](./_build_flag) file to trigger EKS provisioning and Juice Shop deployment.
-
-## Step 1: Deploy the Kubernetes Connector
-
-Create Snyk Service Acount with minimum scope: [docs](https://docs.snyk.io/manage-risk/snyk-apprisk/risk-based-prioritization-for-snyk-apprisk/prioritization-setup/prioritization-setup-kubernetes-connector#step-2-create-a-new-role)
-
-Log into AWS CLI:
-```
-aws configure
-aws eks update-kubeconfig --region us-east-1 --name juice-shop-cluster
-```
-
-Add the secret
-```
-kubectl create secret generic insights-secret --from-literal=snykServiceAccountToken=YOUR_SNYK_TOKEN
-```
-
-Add the Helm chart
-```
-helm repo add kubernetes-scanner https://snyk.github.io/kubernetes-scanner
-helm repo update
-```
-
-Install the chart
-```
-helm install insights \
-	--set "secretName=insights-secret" \
-	--set "config.clusterName=juice-shop-cluster" \
-	--set "config.routes[0].organizationID=YOUR_ORG_ID" \
-	--set "config.routes[0].clusterScopedResources=true" \
-	--set "config.routes[0].namespaces[0]=*"  \
-	kubernetes-scanner/kubernetes-scanner
-```
-
-Run `kubectl get pods` to verify the pod is running.
-
-## Step 2: Scan and Tag Container projects
-
-See [full docs](https://docs.snyk.io/manage-risk/snyk-apprisk/risk-based-prioritization-for-snyk-apprisk/prioritization-setup/prioritization-setup-associating-snyk-open-source-code-and-container-projects) on tagging format. This is required to link Open Source and Code projects with Container projects.
-
-Add tags to container images: [see example workflow](./.github/workflows/container-build-and-test.yml#L35).
-
-Examples:
+To test your setup, try the following prompt:
 
 ```
-snyk container monitor your/image:tag --tags="component=pkg:${{ github.repository }}@${{ github.ref_name }}"
-snyk container monitor your/image:tag --tags="component=pkg:github/org/repo@branch"
+Using Snyk's MCP Server, scan the code for Open Source vulnerabilities.
 ```
 
-## Step 3: Tag Open Source and Code projects
+## Level 1 - Accelerate understanding
 
-Review script at [insights/apply-tags.py](./insights/apply-tags.py).
+Start with asking for more information around a particular recommended fix:
 
 ```
-pip install requests
-python3 insights/apply-tags.py --org-id your-org-id --snyk-token your-snyk-token --origin github
+Assess the breakability of upgrading the multer dependency to fix it's critical severity vulnerability.
 ```
+
+Assuming the response is positive, let's try fixing it:
+```
+Yes, proceed with the upgrade.
+```
+
+We can also use AI to help better understand SAST findings from Snyk. Let's start by running a SAST scan and asking for an explanation for one of the vulnerabilities.
+
+```
+Scan the code for SAST vulnerabilities.
+```
+
+```
+Choose one of the SQL Injection vulnerabilities in the login.ts file and explain it to me.
+```
+
+## Level 2
+
+Add a rule to automate scanning.
+
+Create a file `.github/instructions/snyk.instructions.md` with the following contents:
+
+```
+---
+applyTo: "**"
+---
+After generating any code, always scan for new SAST vulnerabilities using Snyk's MCP server.
+```
+
+Now try fixing that SQL Injection.
+```
+Fix this SQL Injection issue.
+
+```
+
+Let's see Snyk Code automatically scan for vulnerabilities in new code.
+```
+Now, add an API endpoint to check the user's role.
+```
+
+## Level 3
+
+```
+Run the scan with Snyk and list the vulnerbalities that need fixing for this Tier 3 application.
+```
+
