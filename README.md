@@ -31,13 +31,13 @@ Using Snyk's MCP Server, scan the code for Open Source vulnerabilities.
 
 ## Level 1 - Accelerate understanding
 
-Start with asking for more information around a particular recommended fix:
+Start with asking for more information around a particular recommended fix.
 
 ```
 Assess the breakability of upgrading the multer dependency to fix it's critical severity vulnerability.
 ```
 
-Assuming the response is positive, let's try fixing it:
+Assuming the response is positive, let's try fixing it.
 ```
 Yes, proceed with the upgrade.
 ```
@@ -54,9 +54,9 @@ Choose one of the SQL Injection vulnerabilities in the login.ts file and explain
 
 ## Level 2
 
-Add a rule to automate scanning.
+Level 1 is also about interfacing with Snyk through natural language. In level 2, we want to seemlessly integrate into agentic workflows.
 
-Create a file `.github/instructions/snyk.instructions.md` with the following contents:
+To automatically trigger Snyk scans, create a file `.github/instructions/snyk.instructions.md` with the following contents:
 
 ```
 ---
@@ -68,15 +68,18 @@ After generating any code, always scan for new SAST vulnerabilities using Snyk's
 Now try fixing that SQL Injection.
 ```
 Fix this SQL Injection issue.
-
 ```
 
-Let's see Snyk Code automatically scan for vulnerabilities in new code.
+Notice how Snyk Code is automatically invoked to verify that the fix is secure.
+
+Let's see Snyk Code automatically scan for vulnerabilities in brand new code.
 ```
 Now, add an API endpoint to check the user's role.
 ```
 
 ## Level 3
+
+Now that we've added Snyk to our agentic workflow, let's use additional context to better prioritize and align to our internal security policies. 
 
 ```
 Run the scan with Snyk and list the vulnerbalities that need fixing for this Tier 3 application.
