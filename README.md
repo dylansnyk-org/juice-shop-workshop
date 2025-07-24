@@ -55,7 +55,7 @@ Choose one of the SQL Injection vulnerabilities in the login.ts file and explain
 
 ## Level 2
 
-Level 1 is also about interfacing with Snyk through natural language. In level 2, we want to seemlessly integrate into agentic workflows.
+Level 1 is also about interfacing with Snyk through natural language. In level 2, we want to seamlessly integrate into agentic workflows.
 
 To automatically trigger Snyk scans, create a file `.github/instructions/snyk.instructions.md` with the following contents:
 
