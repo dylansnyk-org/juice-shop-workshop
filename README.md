@@ -22,6 +22,7 @@ npm install -g snyk
 - AI-IDE like Cursor, or VS Code in Agent Mode 
   - In VS Code, search "Chat: Open Chat (Agent)"
 - Snyk [IDE Extension](https://docs.snyk.io/cli-ide-and-ci-cd-integrations/snyk-ide-plugins-and-extensions) installed
+- Configure the Snyk MCP Server 
 
 To test your setup, try the following prompt:
 
