@@ -1,4 +1,11 @@
-anthropic==0.49.0
-beatcraft==1.1.5
-sentence-transformers==4.1.0
-diffusers==0.33.1
+anthropic>=0.40.0,<1.0.0
+beatcraft>=1.1.5,<2.0.0
+sentence-transformers>=4.1.0,<5.0.0
+diffusers>=0.33.1,<1.0.0
+
+# Security fixes for transitive dependencies from beatcraft
+setuptools>=78.1.1  # Fixes Code Injection, ReDoS, Directory Traversal
+scikit-learn>=1.5.0  # Fixes Storage of Sensitive Data
+zipp>=3.19.1  # Fixes Infinite loop
+requests>=2.32.4  # Fixes Control Flow + Data Insertion
+urllib3>=2.5.0  # Fixes Proxy-Authorization leak + Open Redirect
