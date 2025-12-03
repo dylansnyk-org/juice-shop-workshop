@@ -9,9 +9,9 @@ import fs from 'fs'
 import logger from './logger'
 import config from 'config'
 import jsSHA from 'jssha'
-import download from 'download'
 import crypto from 'crypto'
 import clarinet from 'clarinet'
+import fetch from 'node-fetch'
 
 import isDocker from './is-docker'
 import isWindows from './is-windows'
@@ -127,8 +127,12 @@ export const extractFilename = (url: string) => {
 
 export const downloadToFile = async (url: string, dest: string) => {
   try {
-    const data = await download(url)
-    fs.writeFileSync(dest, data)
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const buffer = await response.buffer()
+    fs.writeFileSync(dest, buffer)
   } catch (err) {
     logger.warn('Failed to download ' + url + ' (' + getErrorMessage(err) + ')')
   }

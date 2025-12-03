@@ -11,7 +11,7 @@ import jwt, { type JwtPayload, type VerifyErrors } from 'jsonwebtoken'
 import challengeUtils = require('../lib/challengeUtils')
 import logger from '../lib/logger'
 import config from 'config'
-import download from 'download'
+import fetch from 'node-fetch'
 import * as utils from '../lib/utils'
 import { isString } from 'lodash'
 import { Bot } from 'juicy-chat-bot'
@@ -28,7 +28,11 @@ export let bot: Bot | null = null
 export async function initialize () {
   if (utils.isUrl(trainingFile)) {
     const file = utils.extractFilename(trainingFile)
-    const data = await download(trainingFile)
+    const response = await fetch(trainingFile)
+    if (!response.ok) {
+      throw new Error(`Failed to download training file: ${response.status}`)
+    }
+    const data = await response.buffer()
     await fs.writeFile('data/chatbot/' + file, data)
   }
 
