@@ -13,17 +13,6 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-    replace_json: {
-      manifest: {
-        src: 'package.json',
-        changes: {
-          'engines.node': (node || '<%= pkg.engines.node %>'),
-          os: (os ? [os] : '<%= pkg.os %>'),
-          cpu: (platform ? [platform] : '<%= pkg.cpu %>')
-        }
-      }
-    },
-
     compress: {
       pckg: {
         options: {
@@ -83,7 +72,21 @@ module.exports = function (grunt) {
     })
   })
 
-  grunt.loadNpmTasks('grunt-replace-json')
+  // Custom replace_json task (replaces grunt-replace-json to avoid lodash.set vulnerability)
+  grunt.registerTask('replace_json:manifest', 'Replace JSON values in package.json', function () {
+    const fs = require('fs')
+    const pkg = grunt.file.readJSON('package.json')
+    
+    // Apply changes
+    pkg.engines.node = node || pkg.engines.node
+    pkg.os = os ? [os] : pkg.os
+    pkg.cpu = platform ? [platform] : pkg.cpu
+    
+    // Write back to package.json
+    fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n')
+    grunt.log.writeln('Updated package.json manifest')
+  })
+
   grunt.loadNpmTasks('grunt-contrib-compress')
   grunt.registerTask('package', ['replace_json:manifest', 'compress:pckg', 'checksum'])
 }

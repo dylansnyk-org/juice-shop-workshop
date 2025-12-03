@@ -8,8 +8,48 @@ import { type Memory, type Product } from '../../data/types'
 import logger from '../logger'
 import config from 'config'
 import path from 'path'
+import fs from 'fs'
 import colors from 'colors/safe'
-const validateSchema = require('yaml-schema-validator/src')
+import yaml from 'js-yaml'
+
+// Simple schema validator to replace vulnerable yaml-schema-validator
+function validateSchema (configObj: any, options: { schemaPath: string, logLevel?: string }): Array<{ path: string, message: string }> {
+  const errors: Array<{ path: string, message: string }> = []
+  try {
+    const schemaContent = fs.readFileSync(options.schemaPath, 'utf8')
+    const schema = yaml.load(schemaContent) as Record<string, any>
+    validateObject(configObj, schema, '', errors)
+  } catch (err) {
+    errors.push({ path: 'schema', message: `Failed to load schema: ${err}` })
+  }
+  return errors
+}
+
+function validateObject (obj: any, schema: any, currentPath: string, errors: Array<{ path: string, message: string }>) {
+  if (!schema || typeof schema !== 'object') return
+  
+  for (const key of Object.keys(schema)) {
+    const schemaValue = schema[key]
+    const objValue = obj?.[key]
+    const fullPath = currentPath ? `${currentPath}.${key}` : key
+    
+    if (schemaValue?.type) {
+      // This is a leaf node with type definition
+      if (objValue !== undefined && objValue !== null) {
+        const expectedType = schemaValue.type
+        const actualType = Array.isArray(objValue) ? 'array' : typeof objValue
+        if (expectedType === 'array' && !Array.isArray(objValue)) {
+          errors.push({ path: fullPath, message: `${fullPath}: expected array but got ${actualType}` })
+        } else if (expectedType !== 'array' && expectedType !== actualType) {
+          errors.push({ path: fullPath, message: `${fullPath}: expected ${expectedType} but got ${actualType}` })
+        }
+      }
+    } else if (typeof schemaValue === 'object') {
+      // Nested object - recurse
+      validateObject(objValue, schemaValue, fullPath, errors)
+    }
+  }
+}
 
 const specialProducts = [
   { name: '"Christmas Special" challenge product', key: 'useForChristmasSpecialChallenge' },

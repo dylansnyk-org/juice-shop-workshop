@@ -6,11 +6,21 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import fs from 'fs'
 import yaml from 'js-yaml'
+import RateLimit from 'express-rate-limit'
 import { getCodeChallenges } from '../lib/codingChallenges'
 import * as accuracy from '../lib/accuracy'
 import * as utils from '../lib/utils'
 
 const challengeUtils = require('../lib/challengeUtils')
+
+// Rate limiter for code snippet verdict checks
+const snippetRateLimiter = RateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: 'Too many requests, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false
+})
 
 interface SnippetRequestBody {
   challenge: string
@@ -71,7 +81,7 @@ export const getVerdict = (vulnLines: number[], neutralLines: number[], selected
   return notOkLines.length === 0
 }
 
-exports.checkVulnLines = () => async (req: Request<Record<string, unknown>, Record<string, unknown>, VerdictRequestBody>, res: Response, next: NextFunction) => {
+exports.checkVulnLines = () => [snippetRateLimiter, async (req: Request<Record<string, unknown>, Record<string, unknown>, VerdictRequestBody>, res: Response, next: NextFunction) => {
   const key = req.body.key
   let snippetData
   try {
@@ -91,7 +101,7 @@ exports.checkVulnLines = () => async (req: Request<Record<string, unknown>, Reco
   const verdict = getVerdict(vulnLines, neutralLines, selectedLines)
   let hint
   if (fs.existsSync('./data/static/codefixes/' + key + '.info.yml')) {
-    const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key + '.info.yml', 'utf8'))
+    const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + path.basename(key) + '.info.yml', 'utf8'))
     if (codingChallengeInfos?.hints) {
       if (accuracy.getFindItAttempts(key) > codingChallengeInfos.hints.length) {
         if (vulnLines.length === 1) {
@@ -117,4 +127,4 @@ exports.checkVulnLines = () => async (req: Request<Record<string, unknown>, Reco
       hint
     })
   }
-}
+}]

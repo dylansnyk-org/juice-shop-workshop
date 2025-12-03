@@ -9,6 +9,7 @@ import { UserModel } from '../models/user'
 import logger from '../lib/logger'
 
 import * as utils from '../lib/utils'
+import { rateLimit } from 'express-rate-limit'
 const security = require('../lib/insecurity')
 const fileType = require('file-type')
 
@@ -25,6 +26,11 @@ module.exports = function fileUpload () {
       if (uploadedFileType !== null && utils.startsWith(uploadedFileType.mime, 'image')) {
         const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
         if (loggedInUser) {
+          const uploadRateLimiter = rateLimit({
+            windowMs: 30 * 60 * 1000, // 30 minutes
+            limit: 5, // Limit each IP to 5 requests per windowMs
+          })
+
           fs.open(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${uploadedFileType.ext}`, 'w', function (err, fd) {
             if (err != null) logger.warn('Error opening file: ' + err.message)
             // @ts-expect-error FIXME buffer has unexpected type

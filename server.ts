@@ -35,6 +35,7 @@ const helmet = require('helmet')
 const featurePolicy = require('feature-policy')
 const errorhandler = require('errorhandler')
 const cookieParser = require('cookie-parser')
+const csrf = require('csurf')
 const serveIndex = require('serve-index')
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -44,7 +45,30 @@ const yaml = require('js-yaml')
 const swaggerUi = require('swagger-ui-express')
 const RateLimit = require('express-rate-limit')
 const client = require('prom-client')
-const ipfilter = require('express-ipfilter').IpFilter
+
+// Custom IP filter middleware (replaces express-ipfilter to avoid vulnerable ip package)
+const ipfilter = (allowedIps: string[], options: { mode: string }) => {
+  return (req: any, res: any, next: any) => {
+    const clientIp = req.ip || req.connection?.remoteAddress || ''
+    // Normalize IP (remove ::ffff: prefix for IPv4 addresses)
+    const normalizedIp = clientIp.replace(/^::ffff:/, '')
+    
+    if (options.mode === 'allow') {
+      if (allowedIps.includes(normalizedIp)) {
+        next()
+      } else {
+        res.status(403).json({ error: 'Access denied' })
+      }
+    } else {
+      // deny mode
+      if (allowedIps.includes(normalizedIp)) {
+        res.status(403).json({ error: 'Access denied' })
+      } else {
+        next()
+      }
+    }
+  }
+}
 const swaggerDocument = yaml.load(fs.readFileSync('./swagger.yml', 'utf8'))
 const {
   ensureFileIsPassed,
@@ -264,6 +288,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
   app.use(express.static(path.resolve('frontend/dist/frontend')))
   app.use(cookieParser('kekse'))
+  app.use(csrf())
   // vuln-code-snippet end directoryListingChallenge accessLogDisclosureChallenge
 
   /* Configure and enable backend-side i18n */
