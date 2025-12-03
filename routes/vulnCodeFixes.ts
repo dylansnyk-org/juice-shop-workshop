@@ -1,5 +1,6 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import * as accuracy from '../lib/accuracy'
+import path from 'path'
 
 const challengeUtils = require('../lib/challengeUtils')
 const fs = require('fs')
@@ -67,7 +68,14 @@ export const serveCodeFixes = () => (req: Request<FixesRequestParams, Record<str
 }
 
 export const checkCorrectFix = () => async (req: Request<Record<string, unknown>, Record<string, unknown>, VerdictRequestBody>, res: Response, next: NextFunction) => {
-  const key = req.body.key
+  let key = String(req.body.key || '')
+  // Sanitize key to prevent path traversal
+  key = key.replace(/[^a-zA-Z0-9_-]/g, '')
+  if (!key || key.includes('..') || key.includes('/') || key.includes('\\')) {
+    res.status(400).json({ error: 'Invalid key parameter' })
+    return
+  }
+  
   const selectedFix = req.body.selectedFix
   const fixData = readFixes(key)
   if (fixData.fixes.length === 0) {
@@ -76,8 +84,10 @@ export const checkCorrectFix = () => async (req: Request<Record<string, unknown>
     })
   } else {
     let explanation
-    if (fs.existsSync('./data/static/codefixes/' + key + '.info.yml')) {
-      const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key + '.info.yml', 'utf8'))
+    const infoFilePath = path.resolve('./data/static/codefixes/', key + '.info.yml')
+    const baseDir = path.resolve('./data/static/codefixes/')
+    if (infoFilePath.startsWith(baseDir) && fs.existsSync(infoFilePath)) {
+      const codingChallengeInfos = yaml.load(fs.readFileSync(infoFilePath, 'utf8'))
       const selectedFixInfo = codingChallengeInfos?.fixes.find(({ id }: { id: number }) => id === selectedFix + 1)
       if (selectedFixInfo?.explanation) explanation = res.__(selectedFixInfo.explanation)
     }

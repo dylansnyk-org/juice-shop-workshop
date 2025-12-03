@@ -79,8 +79,10 @@ export class AboutComponent implements OnInit {
   populateSlideshowFromFeedbacks () {
     this.feedbackService.find().subscribe((feedbacks) => {
       for (let i = 0; i < feedbacks.length; i++) {
+        // Sanitize feedback comment to prevent XSS
+        const sanitizedComment = String(feedbacks[i].comment || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;')
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        feedbacks[i].comment = `<span style="width: 90%; display:block;">${feedbacks[i].comment}<br/> (${this.stars[feedbacks[i].rating]})</span>`
+        feedbacks[i].comment = `<span style="width: 90%; display:block;">${sanitizedComment}<br/> (${this.stars[feedbacks[i].rating]})</span>`
         feedbacks[i].comment = this.sanitizer.bypassSecurityTrustHtml(feedbacks[i].comment)
         this.slideshowDataSource.push({ url: this.images[i % this.images.length], caption: feedbacks[i].comment })
       }

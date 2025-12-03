@@ -9,6 +9,10 @@ parser.add_argument("--origin", dest="origin", help="SCM type. Possible values: 
 args = parser.parse_args()
 
 SNYK_TOKEN = args.snyk_token
+# Validate ORG_ID to prevent SSRF - must be alphanumeric with hyphens
+import re
+if not re.match(r'^[a-zA-Z0-9\-]+$', args.org_id):
+    raise ValueError("Invalid org_id format - must be alphanumeric with hyphens only")
 ORG_ID = args.org_id
 ORIGIN = args.origin
 

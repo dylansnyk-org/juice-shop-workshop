@@ -9,14 +9,18 @@ import { RecycleModel } from '../models/recycle'
 import * as utils from '../lib/utils'
 
 exports.getRecycleItem = () => (req: Request, res: Response) => {
+  const id = parseInt(req.params.id, 10)
+  if (isNaN(id)) {
+    return res.status(400).send('Invalid ID')
+  }
   RecycleModel.findAll({
     where: {
-      id: JSON.parse(req.params.id)
+      id
     }
   }).then((Recycle) => {
-    return res.send(utils.queryResultToJson(Recycle))
+    return res.json(utils.queryResultToJson(Recycle))
   }).catch((_: unknown) => {
-    return res.send('Error fetching recycled items. Please try again')
+    return res.status(500).send('Error fetching recycled items. Please try again')
   })
 }
 

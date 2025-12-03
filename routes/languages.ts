@@ -23,8 +23,13 @@ module.exports = function getLanguageList () { // TODO Refactor and extend to al
           next(new Error(`Unable to read i18n directory: ${err.message}`))
         }
         languageFiles.forEach((fileName) => {
+          // Sanitize filename to prevent path traversal
+          const safeFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '')
+          if (safeFileName !== fileName || fileName.includes('..') || fileName.includes('/')) {
+            return // Skip invalid filenames
+          }
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          fs.readFile('frontend/dist/frontend/assets/i18n/' + fileName, 'utf-8', async (err, content) => {
+          fs.readFile('frontend/dist/frontend/assets/i18n/' + safeFileName, 'utf-8', async (err, content) => {
             if (err != null) {
               next(new Error(`Unable to retrieve ${fileName} language file: ${err.message}`))
             }

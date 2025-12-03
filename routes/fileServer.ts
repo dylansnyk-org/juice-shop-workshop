@@ -15,22 +15,31 @@ module.exports = function servePublicFiles () {
   return ({ params, query }: Request, res: Response, next: NextFunction) => {
     const file = params.file
 
-    if (!file.includes('/')) {
+    if (!file.includes('/') && !file.includes('..') && !file.includes('\\')) {
       verify(file, res, next)
     } else {
       res.status(403)
-      next(new Error('File names cannot contain forward slashes!'))
+      next(new Error('File names cannot contain forward slashes or directory traversal patterns!'))
     }
   }
 
   function verify (file: string, res: Response, next: NextFunction) {
     if (file && (endsWithAllowlistedFileType(file) || (file === 'incident-support.kdbx'))) {
       file = security.cutOffPoisonNullByte(file)
+      const sanitizedFile = path.basename(file)
+      const resolvedPath = path.resolve('ftp/', sanitizedFile)
+      const baseDir = path.resolve('ftp/')
+      
+      if (!resolvedPath.startsWith(baseDir)) {
+        res.status(403)
+        next(new Error('Invalid file path!'))
+        return
+      }
 
-      challengeUtils.solveIf(challenges.directoryListingChallenge, () => { return file.toLowerCase() === 'acquisitions.md' })
-      verifySuccessfulPoisonNullByteExploit(file)
+      challengeUtils.solveIf(challenges.directoryListingChallenge, () => { return sanitizedFile.toLowerCase() === 'acquisitions.md' })
+      verifySuccessfulPoisonNullByteExploit(sanitizedFile)
 
-      res.sendFile(path.resolve('ftp/', file))
+      res.sendFile(resolvedPath)
     } else {
       res.status(403)
       next(new Error('Only .md and .pdf files are allowed!'))

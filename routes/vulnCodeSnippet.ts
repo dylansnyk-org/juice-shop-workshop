@@ -6,6 +6,7 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import fs from 'fs'
 import yaml from 'js-yaml'
+import path from 'path'
 import { getCodeChallenges } from '../lib/codingChallenges'
 import * as accuracy from '../lib/accuracy'
 import * as utils from '../lib/utils'
@@ -63,7 +64,8 @@ exports.serveChallengesWithCodeSnippet = () => async (req: Request, res: Respons
 }
 
 export const getVerdict = (vulnLines: number[], neutralLines: number[], selectedLines: number[]) => {
-  if (selectedLines === undefined) return false
+  if (selectedLines === undefined || !Array.isArray(selectedLines)) return false
+  if (!Array.isArray(vulnLines) || !Array.isArray(neutralLines)) return false
   if (vulnLines.length > selectedLines.length) return false
   if (!vulnLines.every(e => selectedLines.includes(e))) return false
   const okLines = [...vulnLines, ...neutralLines]
@@ -72,7 +74,13 @@ export const getVerdict = (vulnLines: number[], neutralLines: number[], selected
 }
 
 exports.checkVulnLines = () => async (req: Request<Record<string, unknown>, Record<string, unknown>, VerdictRequestBody>, res: Response, next: NextFunction) => {
-  const key = req.body.key
+  let key = String(req.body.key || '')
+  // Sanitize key to prevent path traversal
+  key = key.replace(/[^a-zA-Z0-9_-]/g, '')
+  if (!key || key.includes('..') || key.includes('/') || key.includes('\\')) {
+    res.status(400).json({ error: 'Invalid key parameter' })
+    return
+  }
   let snippetData
   try {
     snippetData = await retrieveCodeSnippet(key)
@@ -87,11 +95,20 @@ exports.checkVulnLines = () => async (req: Request<Record<string, unknown>, Reco
   }
   const vulnLines: number[] = snippetData.vulnLines
   const neutralLines: number[] = snippetData.neutralLines
-  const selectedLines: number[] = req.body.selectedLines
+  const selectedLines = req.body.selectedLines
+  
+  // Type validation
+  if (!Array.isArray(selectedLines)) {
+    res.status(400).json({ error: 'Invalid selectedLines format - must be an array' })
+    return
+  }
+  
   const verdict = getVerdict(vulnLines, neutralLines, selectedLines)
   let hint
-  if (fs.existsSync('./data/static/codefixes/' + key + '.info.yml')) {
-    const codingChallengeInfos = yaml.load(fs.readFileSync('./data/static/codefixes/' + key + '.info.yml', 'utf8'))
+  const infoFilePath = path.resolve('./data/static/codefixes/', key + '.info.yml')
+  const baseDir = path.resolve('./data/static/codefixes/')
+  if (infoFilePath.startsWith(baseDir) && fs.existsSync(infoFilePath)) {
+    const codingChallengeInfos = yaml.load(fs.readFileSync(infoFilePath, 'utf8'))
     if (codingChallengeInfos?.hints) {
       if (accuracy.getFindItAttempts(key) > codingChallengeInfos.hints.length) {
         if (vulnLines.length === 1) {

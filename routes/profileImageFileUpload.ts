@@ -25,7 +25,9 @@ module.exports = function fileUpload () {
       if (uploadedFileType !== null && utils.startsWith(uploadedFileType.mime, 'image')) {
         const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
         if (loggedInUser) {
-          fs.open(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${uploadedFileType.ext}`, 'w', function (err, fd) {
+          const safeUserId = String(loggedInUser.data.id).replace(/[^a-zA-Z0-9]/g, '')
+          const safeExt = String(uploadedFileType.ext).replace(/[^a-zA-Z0-9]/g, '')
+          fs.open(`frontend/dist/frontend/assets/public/images/uploads/${safeUserId}.${safeExt}`, 'w', function (err, fd) {
             if (err != null) logger.warn('Error opening file: ' + err.message)
             // @ts-expect-error FIXME buffer has unexpected type
             fs.write(fd, buffer, 0, buffer.length, null, function (err) {
@@ -35,7 +37,9 @@ module.exports = function fileUpload () {
           })
           UserModel.findByPk(loggedInUser.data.id).then(async (user: UserModel | null) => {
             if (user != null) {
-              return await user.update({ profileImage: `assets/public/images/uploads/${loggedInUser.data.id}.${uploadedFileType.ext}` })
+              const safeUserId = String(loggedInUser.data.id).replace(/[^a-zA-Z0-9]/g, '')
+              const safeExt = String(uploadedFileType.ext).replace(/[^a-zA-Z0-9]/g, '')
+              return await user.update({ profileImage: `assets/public/images/uploads/${safeUserId}.${safeExt}` })
             }
           }).catch((error: Error) => {
             next(error)

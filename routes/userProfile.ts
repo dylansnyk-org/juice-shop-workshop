@@ -42,19 +42,21 @@ module.exports = function getUserProfile () {
           }
           const theme = themes[config.get<string>('application.theme')]
           if (username) {
+            username = entities.encode(username)
             template = template.replace(/_username_/g, username)
           }
           template = template.replace(/_emailHash_/g, security.hash(user?.email))
           template = template.replace(/_title_/g, entities.encode(config.get('application.name')))
           template = template.replace(/_favicon_/g, favicon())
-          template = template.replace(/_bgColor_/g, theme.bgColor)
-          template = template.replace(/_textColor_/g, theme.textColor)
-          template = template.replace(/_navColor_/g, theme.navColor)
-          template = template.replace(/_primLight_/g, theme.primLight)
-          template = template.replace(/_primDark_/g, theme.primDark)
-          template = template.replace(/_logo_/g, utils.extractFilename(config.get('application.logo')))
+          template = template.replace(/_bgColor_/g, entities.encode(theme.bgColor))
+          template = template.replace(/_textColor_/g, entities.encode(theme.textColor))
+          template = template.replace(/_navColor_/g, entities.encode(theme.navColor))
+          template = template.replace(/_primLight_/g, entities.encode(theme.primLight))
+          template = template.replace(/_primDark_/g, entities.encode(theme.primDark))
+          template = template.replace(/_logo_/g, entities.encode(utils.extractFilename(config.get('application.logo'))))
           const fn = pug.compile(template)
-          const CSP = `img-src 'self' ${user?.profileImage}; script-src 'self' 'unsafe-eval' https://code.getmdl.io http://ajax.googleapis.com`
+          const safeProfileImage = entities.encode(user?.profileImage || '')
+          const CSP = `img-src 'self' ${safeProfileImage}; script-src 'self' 'unsafe-eval' https://code.getmdl.io http://ajax.googleapis.com`
           // @ts-expect-error FIXME type issue with string vs. undefined for username
           challengeUtils.solveIf(challenges.usernameXssChallenge, () => { return user?.profileImage.match(/;[ ]*script-src(.)*'unsafe-inline'/g) !== null && utils.contains(username, '<script>alert(`xss`)</script>') })
 
@@ -62,7 +64,15 @@ module.exports = function getUserProfile () {
             'Content-Security-Policy': CSP
           })
 
-          res.send(fn(user))
+          // Sanitize user data before rendering
+          const sanitizedUser = user ? {
+            ...user.dataValues,
+            username: entities.encode(user.username || ''),
+            email: entities.encode(user.email || ''),
+            profileImage: user.profileImage
+          } : null
+          
+          res.send(fn(sanitizedUser))
         }).catch((error: Error) => {
           next(error)
         })
