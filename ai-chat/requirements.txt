@@ -1,5 +1,5 @@
 # Pin setuptools first to ensure safe version is used
-setuptools>=78.1.1
+setuptools==65.5.1
 
 # Application dependencies
 anthropic==0.49.0

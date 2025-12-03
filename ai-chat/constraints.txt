@@ -1,3 +1,3 @@
 # Constraints to pin vulnerable transitive dependencies to safe versions
-setuptools>=78.1.1
+setuptools==65.5.1
 
