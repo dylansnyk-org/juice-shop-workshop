@@ -32,9 +32,9 @@ module.exports = function profileImageUrlUpload () {
         try {
           const imageResponse = await fetch(url)
           if (imageResponse.ok) {
-            const ext = ['jpg', 'jpeg', 'png', 'svg', 'gif'].includes(url.split('.').slice(-1)[0].toLowerCase()) ? url.split('.').slice(-1)[0].toLowerCase() : 'jpg'
+            const ext = ['jpg', 'jpeg', 'png', 'svg', 'gif'].includes(String(url).split('.').slice(-1)[0].toLowerCase()) ? String(url).split('.').slice(-1)[0].toLowerCase() : 'jpg'
             const filePath = `frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${ext}`
-            const fileStream = fs.createWriteStream(filePath)
+            const fileStream = fs.createWriteStream(path.basename(filePath))
             await new Promise((resolve, reject) => {
               imageResponse.body?.pipe(fileStream)
               imageResponse.body?.on('error', reject)
