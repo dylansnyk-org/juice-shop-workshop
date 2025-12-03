@@ -11,9 +11,22 @@ const challenges = require('../data/datacache').challenges
 const db = require('../data/mongodb')
 const security = require('../lib/insecurity')
 
+// Sanitize and validate MongoDB ObjectId - prevents NoSQL injection
+const sanitizeObjectId = (id: any): string | null => {
+  if (typeof id !== 'string') return null
+  const sanitized = String(id).replace(/[^a-fA-F0-9]/g, '')
+  return /^[a-fA-F0-9]{24}$/.test(sanitized) ? sanitized : null
+}
+
 module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
-    const id = req.body.id
+    // Sanitize id to prevent NoSQL injection (converts to safe string)
+    const id = sanitizeObjectId(req.body.id)
+    
+    if (id === null) {
+      res.status(400).json({ error: 'Invalid review ID format' })
+      return
+    }
     const user = security.authenticatedUsers.from(req)
     db.reviews.findOne({ _id: id }).then((review: Review) => {
       if (!review) {

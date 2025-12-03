@@ -35,6 +35,7 @@ const helmet = require('helmet')
 const featurePolicy = require('feature-policy')
 const errorhandler = require('errorhandler')
 const cookieParser = require('cookie-parser')
+const csrf = require('csurf')
 const serveIndex = require('serve-index')
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -287,6 +288,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
 
   app.use(express.static(path.resolve('frontend/dist/frontend')))
   app.use(cookieParser('kekse'))
+  app.use(csrf())
   // vuln-code-snippet end directoryListingChallenge accessLogDisclosureChallenge
 
   /* Configure and enable backend-side i18n */
