@@ -14,8 +14,14 @@ const security = require('../lib/insecurity')
 module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = security.authenticatedUsers.from(req) // vuln-code-snippet vuln-line forgedReviewChallenge
+    // SECURITY FIX: Sanitize ID to prevent NoSQL Injection (CWE-943)
+    const sanitizedId = String(req.body.id || '').replace(/[^a-zA-Z0-9_-]/g, '')
+    if (!sanitizedId) {
+      res.status(400).json({ error: 'Invalid ID' })
+      return
+    }
     db.reviews.update( // vuln-code-snippet neutral-line forgedReviewChallenge
-      { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
+      { _id: sanitizedId }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
       { $set: { message: req.body.message } },
       { multi: true } // vuln-code-snippet vuln-line noSqlReviewsChallenge
     ).then(
