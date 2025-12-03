@@ -4,16 +4,21 @@
  */
 import models = require('../models/index')
 import { type Product } from '../data/types'
-import fuzz from 'fuzzball'
+import Fuse from 'fuse.js'
 const security = require('./insecurity')
 const challengeUtils = require('./challengeUtils')
 const challenges = require('../data/datacache').challenges
 
 async function productPrice (query: string, user: string) {
   const [products] = await models.sequelize.query('SELECT * FROM Products')
-  const queriedProducts = products
-    .filter((product: Product) => fuzz.partial_ratio(query, product.name) > 60)
-    .map((product: Product) => `${product.name} costs ${product.price}¤`)
+  const fuse = new Fuse(products as Product[], {
+    keys: ['name'],
+    threshold: 0.4,
+    includeScore: true
+  })
+  const results = fuse.search(query)
+  const queriedProducts = results
+    .map((result) => `${result.item.name} costs ${result.item.price}¤`)
   return {
     action: 'response',
     body: queriedProducts.length > 0 ? queriedProducts.join(', ') : 'Sorry I couldn\'t find any products with that name'

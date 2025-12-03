@@ -17,6 +17,12 @@ type cache = Record<string, codeFix>
 const CodeFixes: cache = {}
 
 export const readFixes = (key: string) => {
+  // SECURITY FIX: Sanitize key to prevent Path Traversal (CWE-23)
+  const safeKey = String(key || '').replace(/[^a-zA-Z0-9_-]/g, '')
+  if (!safeKey || safeKey !== key) {
+    throw new Error('Invalid challenge key')
+  }
+  key = safeKey
   if (CodeFixes[key]) {
     return CodeFixes[key]
   }
