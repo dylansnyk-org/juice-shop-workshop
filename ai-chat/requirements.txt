@@ -1,5 +1,8 @@
+# Pin setuptools first to ensure safe version is used
+setuptools>=78.1.1
+
+# Application dependencies
 anthropic==0.49.0
 beatcraft==1.1.5
 sentence-transformers==4.1.0
 diffusers==0.33.1
-setuptools>=78.1.1
