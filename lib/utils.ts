@@ -9,7 +9,7 @@ import fs from 'fs'
 import logger from './logger'
 import config from 'config'
 import jsSHA from 'jssha'
-import download from 'download'
+import axios from 'axios'
 import crypto from 'crypto'
 import clarinet from 'clarinet'
 
@@ -127,8 +127,8 @@ export const extractFilename = (url: string) => {
 
 export const downloadToFile = async (url: string, dest: string) => {
   try {
-    const data = await download(url)
-    fs.writeFileSync(dest, data)
+    const response = await axios.get(url, { responseType: 'arraybuffer' })
+    fs.writeFileSync(dest, Buffer.from(response.data))
   } catch (err) {
     logger.warn('Failed to download ' + url + ' (' + getErrorMessage(err) + ')')
   }

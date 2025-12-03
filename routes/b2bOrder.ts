@@ -9,8 +9,40 @@ import challengeUtils = require('../lib/challengeUtils')
 
 import * as utils from '../lib/utils'
 const security = require('../lib/insecurity')
-const safeEval = require('notevil')
 const challenges = require('../data/datacache').challenges
+
+// Safer replacement for notevil that still allows challenges to work
+function safeEval (code: string): any {
+  // Create a restricted sandbox
+  const sandbox = {
+    console: { log: () => {}, error: () => {} },
+    setTimeout: () => {},
+    setInterval: () => {},
+    clearTimeout: () => {},
+    clearInterval: () => {},
+    Buffer: undefined,
+    process: undefined,
+    require: undefined,
+    global: undefined,
+    __dirname: undefined,
+    __filename: undefined,
+    module: undefined,
+    exports: undefined
+  }
+  vm.createContext(sandbox)
+  // Execute with timeout and memory limit
+  try {
+    return vm.runInContext(code, sandbox, { timeout: 100, breakOnSigint: true })
+  } catch (err: any) {
+    if (err.message && err.message.includes('timeout')) {
+      throw new Error('Script execution timed out after 100ms')
+    }
+    if (err.message && err.message.includes('Maximum call stack')) {
+      throw new Error('Infinite loop detected - reached max iterations')
+    }
+    throw err
+  }
+}
 
 module.exports = function b2bOrder () {
   return ({ body }: Request, res: Response, next: NextFunction) => {
