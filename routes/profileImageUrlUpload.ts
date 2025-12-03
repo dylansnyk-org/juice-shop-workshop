@@ -28,8 +28,21 @@ module.exports = function profileImageUrlUpload () {
           .on('response', function (res: Response) {
             if (res.statusCode === 200) {
               const ext = ['jpg', 'jpeg', 'png', 'svg', 'gif'].includes(url.split('.').slice(-1)[0].toLowerCase()) ? url.split('.').slice(-1)[0].toLowerCase() : 'jpg'
-              imageRequest.pipe(fs.createWriteStream(`frontend/dist/frontend/assets/public/images/uploads/${loggedInUser.data.id}.${ext}`))
-              UserModel.findByPk(loggedInUser.data.id).then(async (user: UserModel | null) => { return await user?.update({ profileImage: `/assets/public/images/uploads/${loggedInUser.data.id}.${ext}` }) }).catch((error: Error) => { next(error) })
+              const safeUserId = String(loggedInUser.data.id).replace(/[^a-zA-Z0-9]/g, '')
+              const safeExt = ext.replace(/[^a-zA-Z0-9]/g, '')
+              
+              // Construct and validate the file path to prevent traversal
+              const uploadsDir = path.resolve('frontend/dist/frontend/assets/public/images/uploads')
+              const targetFile = path.resolve(uploadsDir, `${safeUserId}.${safeExt}`)
+              
+              // Ensure the target file is within the uploads directory
+              if (!targetFile.startsWith(uploadsDir + path.sep)) {
+                next(new Error('Invalid file path'))
+                return
+              }
+              
+              imageRequest.pipe(fs.createWriteStream(targetFile))
+              UserModel.findByPk(loggedInUser.data.id).then(async (user: UserModel | null) => { return await user?.update({ profileImage: `/assets/public/images/uploads/${safeUserId}.${safeExt}` }) }).catch((error: Error) => { next(error) })
             } else UserModel.findByPk(loggedInUser.data.id).then(async (user: UserModel | null) => { return await user?.update({ profileImage: url }) }).catch((error: Error) => { next(error) })
           })
       } else {
