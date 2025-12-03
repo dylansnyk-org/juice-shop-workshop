@@ -191,7 +191,9 @@
     "lodash.set": "^4.3.2",
     "ip": "^2.0.1",
     "decompress-tar": "^4.1.1",
-    "eivindfjeldstad-dot": "^0.0.1"
+    "eivindfjeldstad-dot": "^0.0.1",
+    "inflight": "1.0.6",
+    "tmp": "0.2.4"
   },
   "devDependencies": {
     "@cyclonedx/cyclonedx-npm": "^1.12.0",
