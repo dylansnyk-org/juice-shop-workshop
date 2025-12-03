@@ -71,5 +71,3 @@ terraform.tfstate
 
 .dccache
 .sfdx/** 
-# Snyk Security Extension - AI Rules (auto-generated)
-.cursor/rules/snyk_rules.mdc

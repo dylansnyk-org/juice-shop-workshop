@@ -46,10 +46,8 @@ export class AdministrationComponent implements OnInit {
       this.userDataSource = users
       this.userDataSourceHidden = users
       for (const user of this.userDataSource) {
-        // Sanitize email to prevent XSS
-        const sanitizedEmail = String(user.email || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;')
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        user.email = this.sanitizer.bypassSecurityTrustHtml(`<span class="${user.token ? 'confirmation' : 'error'}">${sanitizedEmail}</span>`)
+        user.email = this.sanitizer.bypassSecurityTrustHtml(`<span class="${user.token ? 'confirmation' : 'error'}">${user.email}</span>`)
       }
       this.userDataSource = new MatTableDataSource(this.userDataSource)
       this.userDataSource.paginator = this.paginatorUsers
@@ -64,9 +62,7 @@ export class AdministrationComponent implements OnInit {
     this.feedbackService.find().subscribe((feedbacks) => {
       this.feedbackDataSource = feedbacks
       for (const feedback of this.feedbackDataSource) {
-        // Sanitize feedback comment to prevent XSS
-        const sanitizedComment = String(feedback.comment || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;')
-        feedback.comment = this.sanitizer.bypassSecurityTrustHtml(sanitizedComment)
+        feedback.comment = this.sanitizer.bypassSecurityTrustHtml(feedback.comment)
       }
       this.feedbackDataSource = new MatTableDataSource(this.feedbackDataSource)
       this.feedbackDataSource.paginator = this.paginatorFeedb

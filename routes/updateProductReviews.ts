@@ -13,17 +13,11 @@ const security = require('../lib/insecurity')
 // vuln-code-snippet start noSqlReviewsChallenge forgedReviewChallenge
 module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
-    const id = String(req.body.id || '')
-    const message = String(req.body.message || '')
-    if (!id || typeof req.body.id !== 'string') {
-      res.status(400).json({ error: 'Invalid ID format' })
-      return
-    }
     const user = security.authenticatedUsers.from(req) // vuln-code-snippet vuln-line forgedReviewChallenge
     db.reviews.update( // vuln-code-snippet neutral-line forgedReviewChallenge
-      { _id: id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
-      { $set: { message } },
-      { multi: false } // vuln-code-snippet vuln-line noSqlReviewsChallenge
+      { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
+      { $set: { message: req.body.message } },
+      { multi: true } // vuln-code-snippet vuln-line noSqlReviewsChallenge
     ).then(
       (result: { modified: number, original: Array<{ author: any }> }) => {
         challengeUtils.solveIf(challenges.noSqlReviewsChallenge, () => { return result.modified > 1 }) // vuln-code-snippet hide-line
