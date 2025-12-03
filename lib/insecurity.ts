@@ -45,9 +45,10 @@ interface IAuthenticatedUsers {
 
 export const hash = (data: string) =>
   crypto.createHash("md5").update(data).digest("hex");
+// SECURITY FIX: Use environment variable for HMAC secret instead of hardcoded value (CWE-547)
 export const hmac = (data: string) =>
   crypto
-    .createHmac("sha256", "pa4qacea4VK9t9nGv7yZtwmj")
+    .createHmac("sha256", process.env.HMAC_SECRET || crypto.randomBytes(32).toString('hex'))
     .update(data)
     .digest("hex");
 
