@@ -213,9 +213,7 @@ export class ScoreBoardLegacyComponent implements OnInit, AfterViewInit {
   }
 
   trustDescriptionHtml (challenge: Challenge) {
-    // Sanitize challenge description to prevent XSS
-    const sanitizedDescription = String(challenge.description || '').replace(/<script[\s\S]*?<\/script>/gi, '').replace(/javascript:/gi, '')
-    challenge.description = this.sanitizer.bypassSecurityTrustHtml(sanitizedDescription)
+    challenge.description = this.sanitizer.bypassSecurityTrustHtml(challenge.description as string)
   }
 
   calculateCodingProgressPercentage () {

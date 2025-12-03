@@ -50,9 +50,7 @@ module.exports = function fileUpload () {
           })
           UserModel.findByPk(loggedInUser.data.id).then(async (user: UserModel | null) => {
             if (user != null) {
-              const safeUserId = String(loggedInUser.data.id).replace(/[^a-zA-Z0-9]/g, '')
-              const safeExt = String(uploadedFileType.ext).replace(/[^a-zA-Z0-9]/g, '')
-              return await user.update({ profileImage: `assets/public/images/uploads/${safeUserId}.${safeExt}` })
+              return await user.update({ profileImage: `assets/public/images/uploads/${loggedInUser.data.id}.${uploadedFileType.ext}` })
             }
           }).catch((error: Error) => {
             next(error)

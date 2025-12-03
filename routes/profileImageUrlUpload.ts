@@ -15,40 +15,7 @@ const request = require('request')
 module.exports = function profileImageUrlUpload () {
   return (req: Request, res: Response, next: NextFunction) => {
     if (req.body.imageUrl !== undefined) {
-      // Type validation
-      if (typeof req.body.imageUrl !== 'string') {
-        res.status(400).send('Invalid image URL type')
-        return
-      }
       const url = req.body.imageUrl
-      
-      // Validate URL to prevent SSRF
-      try {
-        const parsedUrl = new URL(url)
-        const protocol = parsedUrl.protocol
-        const hostname = parsedUrl.hostname.toLowerCase()
-        
-        // Only allow http and https
-        if (protocol !== 'http:' && protocol !== 'https:') {
-          res.status(400).send('Invalid URL protocol')
-          return
-        }
-        
-        // Block private/internal IP ranges and localhost
-        const blockedHosts = ['localhost', '127.0.0.1', '0.0.0.0', '::1', '[::1]']
-        if (blockedHosts.includes(hostname) || 
-            hostname.startsWith('192.168.') || 
-            hostname.startsWith('10.') || 
-            hostname.startsWith('172.16.') ||
-            hostname.startsWith('169.254.')) {
-          res.status(400).send('Access to internal resources is not allowed')
-          return
-        }
-      } catch (e) {
-        res.status(400).send('Invalid URL format')
-        return
-      }
-      
       if (url.match(/(.)*solve\/challenges\/server-side(.)*/) !== null) req.app.locals.abused_ssrf_bug = true
       const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
       if (loggedInUser) {

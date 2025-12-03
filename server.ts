@@ -127,13 +127,6 @@ const startupGauge = new client.Gauge({
   labelNames: ['task']
 })
 
-// Global rate limiter for file system operations and expensive routes
-const fileSystemRateLimiter = new RateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 20, // limit each IP to 20 requests per minute
-  message: 'Too many requests, please try again later'
-})
-
 // Wraps the function and measures its (async) execution time
 const collectDurationPromise = (name: string, func: any) => {
   return async (...args: any) => {
@@ -286,8 +279,8 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.use(bodyParser.urlencoded({ extended: true }))
   /* File Upload */
   app.post('/file-upload', uploadToMemory.single('file'), ensureFileIsPassed, metrics.observeFileUploadMetricsMiddleware(), handleZipFileUpload, checkUploadSize, checkFileType, handleXmlUpload)
-  app.post('/profile/image/file', fileSystemRateLimiter, uploadToMemory.single('file'), ensureFileIsPassed, metrics.observeFileUploadMetricsMiddleware(), profileImageFileUpload())
-  app.post('/profile/image/url', fileSystemRateLimiter, uploadToMemory.single('file'), profileImageUrlUpload())
+  app.post('/profile/image/file', uploadToMemory.single('file'), ensureFileIsPassed, metrics.observeFileUploadMetricsMiddleware(), profileImageFileUpload())
+  app.post('/profile/image/url', uploadToMemory.single('file'), profileImageUrlUpload())
   app.post('/rest/memories', uploadToDisk.single('image'), ensureFileIsPassed, security.appendUserId(), metrics.observeFileUploadMetricsMiddleware(), memory.addMemory())
 
   app.use(bodyParser.text({ type: '*/*' }))
@@ -378,18 +371,12 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   /* User registration challenge verifications before finale takes over */
   app.post('/api/Users', (req: Request, res: Response, next: NextFunction) => {
     if (req.body.email !== undefined && req.body.password !== undefined && req.body.passwordRepeat !== undefined) {
-      // Type validation
-      if (typeof req.body.email !== 'string' || typeof req.body.password !== 'string' || typeof req.body.passwordRepeat !== 'string') {
-        res.status(400).send(res.__('Invalid input types'))
-        return
-      }
       if (req.body.email.length !== 0 && req.body.password.length !== 0) {
         req.body.email = req.body.email.trim()
         req.body.password = req.body.password.trim()
         req.body.passwordRepeat = req.body.passwordRepeat.trim()
       } else {
         res.status(400).send(res.__('Invalid email/password cannot be empty'))
-        return
       }
     }
     next()
@@ -587,7 +574,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/saveLoginIp', saveLoginIp())
   app.post('/rest/user/data-export', security.appendUserId(), imageCaptcha.verifyCaptcha())
   app.post('/rest/user/data-export', security.appendUserId(), dataExport())
-  app.get('/rest/languages', fileSystemRateLimiter, languageList())
+  app.get('/rest/languages', languageList())
   app.get('/rest/order-history', orderHistory.orderHistory())
   app.get('/rest/order-history/orders', security.isAccounting(), orderHistory.allOrders())
   app.put('/rest/order-history/:id/delivery-status', security.isAccounting(), orderHistory.toggleDeliveryStatus())
@@ -615,30 +602,30 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.post('/b2b/v2/orders', b2bOrder())
 
   /* File Serving */
-  app.get('/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg', fileSystemRateLimiter, easterEgg())
-  app.get('/this/page/is/hidden/behind/an/incredibly/high/paywall/that/could/only/be/unlocked/by/sending/1btc/to/us', fileSystemRateLimiter, premiumReward())
-  app.get('/we/may/also/instruct/you/to/refuse/all/reasonably/necessary/responsibility', fileSystemRateLimiter, privacyPolicyProof())
+  app.get('/the/devs/are/so/funny/they/hid/an/easter/egg/within/the/easter/egg', easterEgg())
+  app.get('/this/page/is/hidden/behind/an/incredibly/high/paywall/that/could/only/be/unlocked/by/sending/1btc/to/us', premiumReward())
+  app.get('/we/may/also/instruct/you/to/refuse/all/reasonably/necessary/responsibility', privacyPolicyProof())
 
   /* Route for dataerasure page */
-  app.use('/dataerasure', fileSystemRateLimiter, dataErasure)
+  app.use('/dataerasure', dataErasure)
 
   /* Route for redirects */
   app.get('/redirect', redirect())
 
   /* Routes for promotion video page */
-  app.get('/promotion', fileSystemRateLimiter, videoHandler.promotionVideo())
-  app.get('/video', fileSystemRateLimiter, videoHandler.getVideo())
+  app.get('/promotion', videoHandler.promotionVideo())
+  app.get('/video', videoHandler.getVideo())
 
   /* Routes for profile page */
-  app.get('/profile', fileSystemRateLimiter, security.updateAuthenticatedUsers(), userProfile())
-  app.post('/profile', fileSystemRateLimiter, updateUserProfile())
+  app.get('/profile', security.updateAuthenticatedUsers(), userProfile())
+  app.post('/profile', updateUserProfile())
 
   /* Route for vulnerable code snippets */
-  app.get('/snippets', fileSystemRateLimiter, vulnCodeSnippet.serveChallengesWithCodeSnippet())
-  app.get('/snippets/:challenge', fileSystemRateLimiter, vulnCodeSnippet.serveCodeSnippet())
-  app.post('/snippets/verdict', fileSystemRateLimiter, vulnCodeSnippet.checkVulnLines())
-  app.get('/snippets/fixes/:key', fileSystemRateLimiter, vulnCodeFixes.serveCodeFixes())
-  app.post('/snippets/fixes', fileSystemRateLimiter, vulnCodeFixes.checkCorrectFix())
+  app.get('/snippets', vulnCodeSnippet.serveChallengesWithCodeSnippet())
+  app.get('/snippets/:challenge', vulnCodeSnippet.serveCodeSnippet())
+  app.post('/snippets/verdict', vulnCodeSnippet.checkVulnLines())
+  app.get('/snippets/fixes/:key', vulnCodeFixes.serveCodeFixes())
+  app.post('/snippets/fixes', vulnCodeFixes.checkCorrectFix())
 
   app.use(angular())
 

@@ -42,9 +42,7 @@ export class DataExportComponent implements OnInit {
 
   getNewCaptcha () {
     this.imageCaptchaService.getCaptcha().subscribe((data: any) => {
-      // Sanitize SVG content before rendering
-      const sanitizedImage = String(data.image || '').replace(/<script[\s\S]*?<\/script>/gi, '')
-      this.captcha = this.sanitizer.bypassSecurityTrustHtml(sanitizedImage)
+      this.captcha = this.sanitizer.bypassSecurityTrustHtml(data.image)
     })
   }
 
@@ -57,12 +55,7 @@ export class DataExportComponent implements OnInit {
       this.error = null
       this.confirmation = data.confirmation
       this.userData = data.userData
-      // Create sanitized content for display
-      const sanitizedData = String(this.userData || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      const newWindow = window.open('', '_blank', 'width=500')
-      if (newWindow) {
-        newWindow.document.write('<pre>' + sanitizedData + '</pre>')
-      }
+      window.open('', '_blank', 'width=500')?.document.write(this.userData)
       this.lastSuccessfulTry = new Date()
       localStorage.setItem('lstdtxprt', JSON.stringify(this.lastSuccessfulTry))
       this.ngOnInit()
