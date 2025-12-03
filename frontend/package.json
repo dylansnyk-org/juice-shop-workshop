@@ -44,11 +44,11 @@
     "codemirror": "^5.65.14",
     "codemirror-solidity": "^0.2.5",
     "core-js": "^3.22.5",
-    "ethers": "^6.13.0",
+    "ethers": "^5.7.2",
     "file-saver": "^2.0.2",
     "flag-icons": "^6.9.2",
     "font-mfizz": "^2.4.1",
-    "jwt-decode": "^4.0.0",
+    "jwt-decode": "^3.1.2",
     "lodash-es": "^4.17.21",
     "material-icons": "^0.3.1",
     "ng-mat-search-bar": "^12.0.1",
@@ -76,8 +76,6 @@
     "@babel/runtime": "7.26.10",
     "webpack": "5.94.0",
     "tmp": "0.2.4",
-    "lodash-es": "4.17.21",
-    "rxjs": "7.8.1",
     "micromatch": "4.0.8"
   },
   "devDependencies": {
