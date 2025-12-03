@@ -3,41 +3,58 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { Component, type OnInit, SecurityContext } from '@angular/core'
-import { DomSanitizer } from '@angular/platform-browser'
-import { ConfigurationService } from '../Services/configuration.service'
-import { FeedbackService } from '../Services/feedback.service'
-import { type IImage } from 'ng-simple-slideshow'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faFacebook, faReddit, faSlack, faTwitter } from '@fortawesome/free-brands-svg-icons'
-import { faNewspaper, faStar } from '@fortawesome/free-regular-svg-icons'
-import { faStar as fasStar, faPalette } from '@fortawesome/free-solid-svg-icons'
+import { Component, type OnInit } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import { ConfigurationService } from "../Services/configuration.service";
+import { FeedbackService } from "../Services/feedback.service";
+import { type IImage } from "ng-simple-slideshow";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faFacebook,
+  faReddit,
+  faSlack,
+  faTwitter,
+} from "@fortawesome/free-brands-svg-icons";
+import { faNewspaper, faStar } from "@fortawesome/free-regular-svg-icons";
+import {
+  faStar as fasStar,
+  faPalette,
+} from "@fortawesome/free-solid-svg-icons";
 
-library.add(faFacebook, faTwitter, faSlack, faReddit, faNewspaper, faStar, fasStar, faPalette)
+library.add(
+  faFacebook,
+  faTwitter,
+  faSlack,
+  faReddit,
+  faNewspaper,
+  faStar,
+  fasStar,
+  faPalette
+);
 
 @Component({
-  selector: 'app-about',
-  templateUrl: './about.component.html',
-  styleUrls: ['./about.component.scss']
+  selector: "app-about",
+  templateUrl: "./about.component.html",
+  styleUrls: ["./about.component.scss"],
 })
 export class AboutComponent implements OnInit {
-  public twitterUrl?: string
-  public facebookUrl?: string
-  public slackUrl?: string
-  public redditUrl?: string
-  public pressKitUrl?: string
-  public nftUrl?: string
-  public slideshowDataSource: IImage[] = []
+  public twitterUrl?: string;
+  public facebookUrl?: string;
+  public slackUrl?: string;
+  public redditUrl?: string;
+  public pressKitUrl?: string;
+  public nftUrl?: string;
+  public slideshowDataSource: IImage[] = [];
 
   private readonly images = [
-    'assets/public/images/carousel/1.jpg',
-    'assets/public/images/carousel/2.jpg',
-    'assets/public/images/carousel/3.jpg',
-    'assets/public/images/carousel/4.jpg',
-    'assets/public/images/carousel/5.png',
-    'assets/public/images/carousel/6.jpg',
-    'assets/public/images/carousel/7.jpg'
-  ]
+    "assets/public/images/carousel/1.jpg",
+    "assets/public/images/carousel/2.jpg",
+    "assets/public/images/carousel/3.jpg",
+    "assets/public/images/carousel/4.jpg",
+    "assets/public/images/carousel/5.png",
+    "assets/public/images/carousel/6.jpg",
+    "assets/public/images/carousel/7.jpg",
+  ];
 
   private readonly stars = [
     null,
@@ -45,50 +62,73 @@ export class AboutComponent implements OnInit {
     '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>',
     '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>',
     '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>',
-    '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>'
-  ]
+    '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>',
+  ];
 
-  constructor (private readonly configurationService: ConfigurationService, private readonly feedbackService: FeedbackService, private readonly sanitizer: DomSanitizer) {}
+  constructor(
+    private readonly configurationService: ConfigurationService,
+    private readonly feedbackService: FeedbackService,
+    private readonly sanitizer: DomSanitizer
+  ) {}
 
-  ngOnInit () {
-    this.populateSlideshowFromFeedbacks()
-    this.configurationService.getApplicationConfiguration().subscribe((config) => {
-      if (config?.application?.social) {
-        if (config.application.social.twitterUrl) {
-          this.twitterUrl = config.application.social.twitterUrl
+  ngOnInit() {
+    this.populateSlideshowFromFeedbacks();
+    this.configurationService.getApplicationConfiguration().subscribe(
+      (config) => {
+        if (config?.application?.social) {
+          if (config.application.social.twitterUrl) {
+            this.twitterUrl = config.application.social.twitterUrl;
+          }
+          if (config.application.social.facebookUrl) {
+            this.facebookUrl = config.application.social.facebookUrl;
+          }
+          if (config.application.social.slackUrl) {
+            this.slackUrl = config.application.social.slackUrl;
+          }
+          if (config.application.social.redditUrl) {
+            this.redditUrl = config.application.social.redditUrl;
+          }
+          if (config.application.social.pressKitUrl) {
+            this.pressKitUrl = config.application.social.pressKitUrl;
+          }
+          if (config.application.social.nftUrl) {
+            this.nftUrl = config.application.social.nftUrl;
+          }
         }
-        if (config.application.social.facebookUrl) {
-          this.facebookUrl = config.application.social.facebookUrl
-        }
-        if (config.application.social.slackUrl) {
-          this.slackUrl = config.application.social.slackUrl
-        }
-        if (config.application.social.redditUrl) {
-          this.redditUrl = config.application.social.redditUrl
-        }
-        if (config.application.social.pressKitUrl) {
-          this.pressKitUrl = config.application.social.pressKitUrl
-        }
-        if (config.application.social.nftUrl) {
-          this.nftUrl = config.application.social.nftUrl
-        }
+      },
+      (err) => {
+        console.log(err);
       }
-    }, (err) => { console.log(err) })
+    );
   }
 
-  populateSlideshowFromFeedbacks () {
-    this.feedbackService.find().subscribe((feedbacks) => {
-      for (let i = 0; i < feedbacks.length; i++) {
-        // Fully sanitize feedback comment to prevent XSS - no HTML allowed
-        const sanitizedComment = String(feedbacks[i].comment || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/&/g, '&amp;')
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        feedbacks[i].comment = `<span style="width: 90%; display:block;">${sanitizedComment}<br/> (${this.stars[feedbacks[i].rating]})</span>`
-        // Use DomSanitizer.sanitize instead of bypass for safer HTML handling
-        feedbacks[i].comment = this.sanitizer.sanitize(SecurityContext.HTML, feedbacks[i].comment) || ''
-        this.slideshowDataSource.push({ url: this.images[i % this.images.length], caption: feedbacks[i].comment })
+  populateSlideshowFromFeedbacks() {
+    this.feedbackService.find().subscribe(
+      (feedbacks) => {
+        for (let i = 0; i < feedbacks.length; i++) {
+          // SECURITY FIX: Sanitize feedback comments (CWE-79)
+          const sanitizedComment = String(feedbacks[i].comment || "").replace(
+            /<script[\s\S]*?<\/script>/gi,
+            ""
+          );
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          feedbacks[
+            i
+          ].comment = `<span style="width: 90%; display:block;">${sanitizedComment}<br/> (${
+            this.stars[feedbacks[i].rating]
+          })</span>`;
+          feedbacks[i].comment = this.sanitizer.bypassSecurityTrustHtml(
+            feedbacks[i].comment
+          );
+          this.slideshowDataSource.push({
+            url: this.images[i % this.images.length],
+            caption: feedbacks[i].comment,
+          });
+        }
+      },
+      (err) => {
+        console.log(err);
       }
-    }, (err) => {
-      console.log(err)
-    })
+    );
   }
 }

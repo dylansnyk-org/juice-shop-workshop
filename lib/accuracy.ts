@@ -76,6 +76,16 @@ function calculateAccuracy(challengeKey: string, phase: Phase) {
 }
 
 function storeVerdict(challengeKey: string, phase: Phase, verdict: boolean) {
+  // SECURITY FIX: Sanitize challengeKey to prevent Prototype Pollution (CWE-1321)
+  const safeKey = String(challengeKey || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  if (
+    safeKey !== challengeKey ||
+    !safeKey ||
+    ['__proto__', 'constructor', 'prototype'].includes(safeKey)
+  ) {
+    return; // Reject dangerous keys
+  }
+  challengeKey = safeKey;
   if (!solves[challengeKey]) {
     solves[challengeKey] = {
       'find it': false,

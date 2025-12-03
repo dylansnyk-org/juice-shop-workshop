@@ -3,67 +3,82 @@
  * SPDX-License-Identifier: MIT
  */
 
-import fs = require('fs')
-import path = require('path')
-import { type Request, type Response, type NextFunction } from 'express'
-import { UserModel } from '../models/user'
-import logger from '../lib/logger'
+import fs = require('fs');
+import { type Request, type Response, type NextFunction } from 'express';
+import { UserModel } from '../models/user';
+import logger from '../lib/logger';
 
-import * as utils from '../lib/utils'
-const security = require('../lib/insecurity')
-const fileType = require('file-type')
+import * as utils from '../lib/utils';
+const security = require('../lib/insecurity');
+const fileType = require('file-type');
 
-module.exports = function fileUpload () {
+module.exports = function fileUpload() {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const file = req.file
-    const buffer = file?.buffer
-    const uploadedFileType = await fileType.fromBuffer(buffer)
+    const file = req.file;
+    const buffer = file?.buffer;
+    const uploadedFileType = await fileType.fromBuffer(buffer);
 
     if (uploadedFileType === undefined) {
-      res.status(500)
-      next(new Error('Illegal file type'))
+      res.status(500);
+      next(new Error('Illegal file type'));
     } else {
-      if (uploadedFileType !== null && utils.startsWith(uploadedFileType.mime, 'image')) {
-        const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
+      if (
+        uploadedFileType !== null &&
+        utils.startsWith(uploadedFileType.mime, 'image')
+      ) {
+        const loggedInUser = security.authenticatedUsers.get(req.cookies.token);
         if (loggedInUser) {
-          const safeUserId = String(loggedInUser.data.id).replace(/[^a-zA-Z0-9]/g, '')
-          const safeExt = String(uploadedFileType.ext).replace(/[^a-zA-Z0-9]/g, '')
-          
-          // Construct and validate the file path to prevent traversal
-          const uploadsDir = path.resolve('frontend/dist/frontend/assets/public/images/uploads')
-          const targetFile = path.resolve(uploadsDir, `${safeUserId}.${safeExt}`)
-          
-          // Ensure the target file is within the uploads directory
-          if (!targetFile.startsWith(uploadsDir + path.sep)) {
-            res.status(400)
-            next(new Error('Invalid file path'))
-            return
-          }
-          
-          fs.open(targetFile, 'w', function (err, fd) {
-            if (err != null) logger.warn('Error opening file: ' + err.message)
-            // @ts-expect-error FIXME buffer has unexpected type
-            fs.write(fd, buffer, 0, buffer.length, null, function (err) {
-              if (err != null) logger.warn('Error writing file: ' + err.message)
-              fs.close(fd, function () { })
-            })
-          })
-          UserModel.findByPk(loggedInUser.data.id).then(async (user: UserModel | null) => {
-            if (user != null) {
-              return await user.update({ profileImage: `assets/public/images/uploads/${loggedInUser.data.id}.${uploadedFileType.ext}` })
+          // SECURITY FIX: Sanitize user ID to prevent Path Traversal (CWE-23)
+          const safeUserId = String(loggedInUser.data.id).replace(
+            /[^a-zA-Z0-9_-]/g,
+            ''
+          );
+          const safeExt = String(uploadedFileType.ext).replace(
+            /[^a-zA-Z0-9]/g,
+            ''
+          );
+          fs.open(
+            `frontend/dist/frontend/assets/public/images/uploads/${safeUserId}.${safeExt}`,
+            'w',
+            function (err, fd) {
+              if (err != null)
+                logger.warn('Error opening file: ' + err.message);
+              // @ts-expect-error FIXME buffer has unexpected type
+              fs.write(fd, buffer, 0, buffer.length, null, function (err) {
+                if (err != null)
+                  logger.warn('Error writing file: ' + err.message);
+                fs.close(fd, function () {});
+              });
             }
-          }).catch((error: Error) => {
-            next(error)
-          })
-          res.location(process.env.BASE_PATH + '/profile')
-          res.redirect(process.env.BASE_PATH + '/profile')
+          );
+          UserModel.findByPk(loggedInUser.data.id)
+            .then(async (user: UserModel | null) => {
+              if (user != null) {
+                return await user.update({
+                  profileImage: `assets/public/images/uploads/${loggedInUser.data.id}.${uploadedFileType.ext}`,
+                });
+              }
+            })
+            .catch((error: Error) => {
+              next(error);
+            });
+          res.location(process.env.BASE_PATH + '/profile');
+          res.redirect(process.env.BASE_PATH + '/profile');
         } else {
-          next(new Error('Blocked illegal activity by ' + req.socket.remoteAddress))
+          next(
+            new Error('Blocked illegal activity by ' + req.socket.remoteAddress)
+          );
         }
       } else {
-        res.status(415)
-        next(new Error(`Profile image upload does not accept this file type${uploadedFileType ? (': ' + uploadedFileType.mime) : '.'}`))
+        res.status(415);
+        next(
+          new Error(
+            `Profile image upload does not accept this file type${
+              uploadedFileType ? ': ' + uploadedFileType.mime : '.'
+            }`
+          )
+        );
       }
     }
-  }
-}
+  };
+};

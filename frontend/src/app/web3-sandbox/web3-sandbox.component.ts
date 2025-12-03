@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
 import { KeysService } from '../Services/keys.service'
 import { SnackBarHelperService } from '../Services/snack-bar-helper.service'
-import { getDefaultProvider, ethers, BigNumber } from 'ethers'
+import { getDefaultProvider, ethers, BrowserProvider, Contract, ContractFactory, parseUnits, type Overrides } from 'ethers'
 import {
   createClient,
   connect,
@@ -124,27 +124,27 @@ contract HelloWorld {
         return
       }
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner()
+      const provider = new BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
 
       const contractBytecode = selectedContract.evm.bytecode.object
       const contractAbi = selectedContract.abi
 
-      const factory = new ethers.ContractFactory(
+      const factory = new ContractFactory(
         contractAbi,
         contractBytecode,
         signer
       )
-      const transactionOptions: ethers.PayableOverrides = {}
+      const transactionOptions: Overrides = {}
       if (this.commonGweiValue > 0) {
-        transactionOptions.value = ethers.utils.parseUnits(
+        transactionOptions.value = parseUnits(
           this.commonGweiValue.toString(),
           'gwei'
         )
       }
       const contract = await factory.deploy(transactionOptions)
-      await contract.deployed()
-      this.deployedContractAddress = contract.address
+      await contract.waitForDeployment()
+      this.deployedContractAddress = await contract.getAddress()
 
       this.contractFunctions = contractAbi
         .filter((item) => item.type === 'function')
@@ -188,9 +188,9 @@ contract HelloWorld {
       const selectedContract =
         this.compiledContracts[this.selectedContractName]
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner()
-      const contract = new ethers.Contract(
+      const provider = new BrowserProvider(window.ethereum)
+      const signer = await provider.getSigner()
+      const contract = new Contract(
         this.deployedContractAddress,
         selectedContract.abi,
         signer
@@ -203,9 +203,9 @@ contract HelloWorld {
             return this.parseInputValue(value.trim(), inputType)
           })
           : []
-      const transactionOptions: ethers.PayableOverrides = {}
+      const transactionOptions: Overrides = {}
       if (this.commonGweiValue > 0) {
-        transactionOptions.value = ethers.utils.parseUnits(
+        transactionOptions.value = parseUnits(
           this.commonGweiValue.toString(),
           'gwei'
         )

@@ -31,6 +31,12 @@ const setStatusCode = (error: any) => {
 }
 
 export const retrieveCodeSnippet = async (challengeKey: string) => {
+  // SECURITY FIX: Sanitize challengeKey to prevent Path Traversal (CWE-23)
+  const safeKey = String(challengeKey || '').replace(/[^a-zA-Z0-9_-]/g, '')
+  if (!safeKey || safeKey !== challengeKey) {
+    throw new Error('Invalid challenge key')
+  }
+  challengeKey = safeKey
   const codeChallenges = await getCodeChallenges()
   if (codeChallenges.has(challengeKey)) {
     return codeChallenges.get(challengeKey) ?? null
