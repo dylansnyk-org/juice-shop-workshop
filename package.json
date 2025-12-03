@@ -172,7 +172,6 @@
     "swagger-ui-express": "^5.0.0",
     "unzipper": "0.12.1",
     "winston": "^3.3.3",
-    "yaml-schema-validator": "^1.2.2",
     "z85": "^0.0.2"
   },
   "devDependencies": {

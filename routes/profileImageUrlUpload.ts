@@ -7,13 +7,23 @@ import fs = require('fs')
 import { type Request, type Response, type NextFunction } from 'express'
 import logger from '../lib/logger'
 import fetch from 'node-fetch'
+import RateLimit from 'express-rate-limit'
 
 import { UserModel } from '../models/user'
 import * as utils from '../lib/utils'
 const security = require('../lib/insecurity')
 
+// Rate limiter: max 5 profile image uploads per minute per IP
+const uploadRateLimiter = RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5,
+  message: 'Too many profile image uploads, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false
+})
+
 module.exports = function profileImageUrlUpload () {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return [uploadRateLimiter, async (req: Request, res: Response, next: NextFunction) => {
     if (req.body.imageUrl !== undefined) {
       const url = req.body.imageUrl
       if (url.match(/(.)*solve\/challenges\/server-side(.)*/) !== null) req.app.locals.abused_ssrf_bug = true
@@ -47,5 +57,5 @@ module.exports = function profileImageUrlUpload () {
     }
     res.location(process.env.BASE_PATH + '/profile')
     res.redirect(process.env.BASE_PATH + '/profile')
-  }
+  }]
 }
