@@ -4,6 +4,7 @@
  */
 
 import fs = require('fs')
+import path = require('path')
 import { type Request, type Response, type NextFunction } from 'express'
 import { UserModel } from '../models/user'
 import logger from '../lib/logger'
@@ -27,7 +28,19 @@ module.exports = function fileUpload () {
         if (loggedInUser) {
           const safeUserId = String(loggedInUser.data.id).replace(/[^a-zA-Z0-9]/g, '')
           const safeExt = String(uploadedFileType.ext).replace(/[^a-zA-Z0-9]/g, '')
-          fs.open(`frontend/dist/frontend/assets/public/images/uploads/${safeUserId}.${safeExt}`, 'w', function (err, fd) {
+          
+          // Construct and validate the file path to prevent traversal
+          const uploadsDir = path.resolve('frontend/dist/frontend/assets/public/images/uploads')
+          const targetFile = path.resolve(uploadsDir, `${safeUserId}.${safeExt}`)
+          
+          // Ensure the target file is within the uploads directory
+          if (!targetFile.startsWith(uploadsDir + path.sep)) {
+            res.status(400)
+            next(new Error('Invalid file path'))
+            return
+          }
+          
+          fs.open(targetFile, 'w', function (err, fd) {
             if (err != null) logger.warn('Error opening file: ' + err.message)
             // @ts-expect-error FIXME buffer has unexpected type
             fs.write(fd, buffer, 0, buffer.length, null, function (err) {

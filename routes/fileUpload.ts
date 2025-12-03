@@ -11,8 +11,9 @@ import path from 'path'
 import * as utils from '../lib/utils'
 
 const challenges = require('../data/datacache').challenges
-const libxml = require('libxmljs2')
-const vm = require('vm')
+// SECURITY FIX: Removed libxmljs2 and vm due to critical vulnerabilities
+// const libxml = require('libxmljs2') // REMOVED: CVE-2024-34393, CVE-2024-34394
+// const vm = require('vm') // REMOVED: Use isolated-vm or remove code execution
 const unzipper = require('unzipper')
 
 function ensureFileIsPassed ({ file }: Request, res: Response, next: NextFunction) {
@@ -78,32 +79,10 @@ function checkFileType ({ file }: Request, res: Response, next: NextFunction) {
 function handleXmlUpload ({ file }: Request, res: Response, next: NextFunction) {
   if (utils.endsWith(file?.originalname.toLowerCase(), '.xml')) {
     challengeUtils.solveIf(challenges.deprecatedInterfaceChallenge, () => { return true })
-    if (((file?.buffer) != null) && !utils.disableOnContainerEnv()) { // XXE attacks in Docker/Heroku containers regularly cause "segfault" crashes
-      const data = file.buffer.toString()
-      try {
-        const sandbox = { libxml, data }
-        vm.createContext(sandbox)
-        const xmlDoc = vm.runInContext('libxml.parseXml(data, { noblanks: true, noent: true, nocdata: true })', sandbox, { timeout: 2000 })
-        const xmlString = xmlDoc.toString(false)
-        challengeUtils.solveIf(challenges.xxeFileDisclosureChallenge, () => { return (utils.matchesEtcPasswdFile(xmlString) || utils.matchesSystemIniFile(xmlString)) })
-        res.status(410)
-        next(new Error('B2B customer complaints via file upload have been deprecated for security reasons: ' + utils.trunc(xmlString, 400) + ' (' + file.originalname + ')'))
-      } catch (err: any) { // TODO: Remove any
-        if (utils.contains(err.message, 'Script execution timed out')) {
-          if (challengeUtils.notSolved(challenges.xxeDosChallenge)) {
-            challengeUtils.solve(challenges.xxeDosChallenge)
-          }
-          res.status(503)
-          next(new Error('Sorry, we are temporarily not available! Please try again later.'))
-        } else {
-          res.status(410)
-          next(new Error('B2B customer complaints via file upload have been deprecated for security reasons: ' + err.message + ' (' + file.originalname + ')'))
-        }
-      }
-    } else {
-      res.status(410)
-      next(new Error('B2B customer complaints via file upload have been deprecated for security reasons (' + file?.originalname + ')'))
-    }
+    // SECURITY FIX: XXE processing disabled due to critical vulnerabilities
+    // XML parsing with libxmljs2 removed (CVE-2024-34393, CVE-2024-34394)
+    res.status(410)
+    next(new Error('B2B customer complaints via XML file upload have been permanently disabled for security reasons (' + file?.originalname + ')'))
   }
   res.status(204).end()
 }

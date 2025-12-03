@@ -9,7 +9,8 @@ import fs from 'fs'
 import logger from './logger'
 import config from 'config'
 import jsSHA from 'jssha'
-import download from 'download'
+// SECURITY FIX: download package removed due to vulnerable dependencies
+// import download from 'download'
 import crypto from 'crypto'
 import clarinet from 'clarinet'
 
@@ -126,12 +127,13 @@ export const extractFilename = (url: string) => {
 }
 
 export const downloadToFile = async (url: string, dest: string) => {
-  try {
-    const data = await download(url)
-    fs.writeFileSync(dest, data)
-  } catch (err) {
-    logger.warn('Failed to download ' + url + ' (' + getErrorMessage(err) + ')')
-  }
+  // SECURITY FIX: File download feature disabled due to vulnerable dependencies
+  // download package had multiple critical vulnerabilities (got, ip, etc.)
+  logger.warn('File download feature disabled for security - ' + url + ' not downloaded to ' + dest)
+  // If this feature is needed, replace with:
+  // - https module (built-in)
+  // - axios package
+  // - node-fetch package
 }
 
 export const jwtFrom = ({ headers }: { headers: any }) => {

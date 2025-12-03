@@ -39,6 +39,7 @@ export const totalFindItAccuracy = () => {
 export const totalFixItAccuracy = () => {
   return totalAccuracy('fix it');
 };
+
 export const getFindItAttempts = (challengeKey: string) => {
   return solves[challengeKey] ? solves[challengeKey].attempts['find it'] : 0;
 };

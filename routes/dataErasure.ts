@@ -9,13 +9,21 @@ import { UserModel } from '../models/user'
 import { SecurityQuestionModel } from '../models/securityQuestion'
 import { PrivacyRequestModel } from '../models/privacyRequests'
 const insecurity = require('../lib/insecurity')
+const RateLimit = require('express-rate-limit')
 
 const challenges = require('../data/datacache').challenges
 const challengeUtils = require('../lib/challengeUtils')
 const router = express.Router()
 
+// Rate limiter for expensive file operations
+const rateLimiter = new RateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // 10 requests per minute
+  message: 'Too many requests, please try again later'
+})
+
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-router.get('/', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.get('/', rateLimiter, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const loggedInUser = insecurity.authenticatedUsers.get(req.cookies.token)
   if (!loggedInUser) {
     next(new Error('Blocked illegal activity by ' + req.socket.remoteAddress))
@@ -51,7 +59,7 @@ interface DataErasureRequestParams {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
-router.post('/', async (req: Request<Record<string, unknown>, Record<string, unknown>, DataErasureRequestParams>, res: Response, next: NextFunction): Promise<void> => {
+router.post('/', rateLimiter, async (req: Request<Record<string, unknown>, Record<string, unknown>, DataErasureRequestParams>, res: Response, next: NextFunction): Promise<void> => {
   const loggedInUser = insecurity.authenticatedUsers.get(req.cookies.token)
   if (!loggedInUser) {
     next(new Error('Blocked illegal activity by ' + req.socket.remoteAddress))
