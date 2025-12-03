@@ -78,7 +78,8 @@
     "tmp": "0.2.4",
     "elliptic": "6.6.2",
     "inflight": "1.0.6",
-    "micromatch": "4.0.8"
+    "micromatch": "4.0.8",
+    "vite": "5.4.21"
   },
   "devDependencies": {
     "@angular-eslint/builder": "^0.8.0-beta.7",

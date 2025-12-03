@@ -48,15 +48,23 @@ Upgraded from Angular 15 → **Angular 16.2** (LTS):
 - ✅ `zone.js`: 0.11.4 → **0.13.3**
 
 #### 5. **NPM Overrides Added**
+- ✅ `vite`: **5.4.21** (Fixes 2 HIGH + 5 MEDIUM authorization/traversal issues)
 - ✅ `elliptic`: **6.6.2** (Cryptographic fix for ethers)
 - ✅ `inflight`: **1.0.6** (Latest available)
 - ✅ `micromatch`: **4.0.8**
 - ✅ Plus existing: js-yaml, ws, socket.io-parser, @babel/runtime, webpack, tmp
 
+#### 6. **Vite Build Tool** (2 HIGH + 5 MEDIUM + 1 LOW)
+Added override for `vite@5.4.21` to fix:
+- ✅ **2x HIGH:** Incorrect Authorization (CVE-2025-30208, CVE-2025-31486)
+- ✅ **5x MEDIUM:** Origin Validation, Access Control Bypass, Information Exposure, Directory Traversal (2x)
+- ✅ **1x LOW:** Relative Path Traversal
+
 ### Known Remaining Issues (Not Fixable):
 - ⚠️ **anuglar2-qrcode** → GPL-3.0 license in `qrious@4.0.2` (license issue, not security)
 - ⚠️ **codemirror@5.65.20** → ReDoS (v6 requires complete rewrite)
 - ⚠️ **codemirror-solidity** → Depends on codemirror 5
+- ⚠️ **vite** → 1 remaining MEDIUM (CVE-2025-62522) fixed in vite@7.1.11 (incompatible with Angular 16)
 
 ---
 
@@ -170,6 +178,7 @@ snyk test
 ✅ Upgraded 30+ npm packages to secure versions  
 ✅ Added comprehensive npm overrides for transitive dependencies  
 ✅ Upgraded Angular framework (15 → 16) - 13 packages  
+✅ Fixed vite vulnerabilities (2 HIGH + 5 MEDIUM) via override  
 ✅ Fixed all reported Snyk test failures  
 
 ### Python (ai-chat):
