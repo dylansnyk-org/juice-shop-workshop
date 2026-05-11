@@ -1,0 +1,73 @@
+name: Snyk Code
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  snyk-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Snyk CLI
+        run: |
+          curl --compressed https://downloads.snyk.io/cli/latest/snyk-linux -o snyk
+          chmod +x ./snyk
+          sudo mv ./snyk /usr/local/bin/
+          snyk --version
+
+      - name: Set up Node.js (for snyk-to-html)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install snyk-to-html
+        run: npm install -g snyk-to-html
+
+      - name: Snyk Code test
+        id: snyk
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SNYK_ORG: ${{ secrets.SNYK_ORG }}
+        run: |
+          set -euo pipefail
+          ORG_ARGS=()
+          if [ -n "${SNYK_ORG:-}" ]; then
+            ORG_ARGS=(--org "$SNYK_ORG")
+          fi
+          snyk code test "${ORG_ARGS[@]}" --json-file-output=snyk-code-results.json
+
+      - name: Generate HTML report (snyk-to-html)
+        if: always()
+        run: |
+          if [ -f snyk-code-results.json ]; then
+            snyk-to-html -i snyk-code-results.json -o snyk-code-report.html
+          else
+            echo "No snyk-code-results.json; skipping HTML report."
+          fi
+
+      - name: Upload HTML report
+        if: always() && hashFiles('snyk-code-report.html') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-code-report
+          path: snyk-code-report.html
+
+      - name: Fail if Snyk Code test failed
+        if: steps.snyk.outcome == 'failure'
+        run: |
+          echo "Snyk Code reported issues. Download the snyk-code-report artifact for the HTML summary."
+          exit 1

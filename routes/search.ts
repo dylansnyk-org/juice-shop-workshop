@@ -6,6 +6,7 @@
 import models = require('../models/index')
 import { type Request, type Response, type NextFunction } from 'express'
 import { UserModel } from '../models/user'
+import { Op } from 'sequelize'
 
 import * as utils from '../lib/utils'
 const challengeUtils = require('../lib/challengeUtils')
@@ -15,8 +16,31 @@ class ErrorWithParent extends Error {
   parent: Error | undefined
 }
 
+function escapeForLike (value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_')
+}
+
+function searchUsers () {
+  return (req: Request, res: Response, next: NextFunction) => {
+    let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
+    criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
+    const pattern = '%' + escapeForLike(String(criteria)) + '%'
+    const escapedPattern = models.sequelize.escape(pattern)
+    UserModel.findAll({
+      where: models.sequelize.literal(`(username LIKE ${escapedPattern} ESCAPE '\\' OR email LIKE ${escapedPattern} ESCAPE '\\')`),
+      attributes: {
+        exclude: ['password', 'totpSecret', 'deluxeToken']
+      }
+    }).then((users: UserModel[]) => {
+      res.json(utils.queryResultToJson(users))
+    }).catch((error: Error) => {
+      next(error)
+    })
+  }
+}
+
 // vuln-code-snippet start unionSqlInjectionChallenge dbSchemaChallenge
-module.exports = function searchProducts () {
+function searchProducts () {
   return (req: Request, res: Response, next: NextFunction) => {
     let criteria: any = req.query.q === 'undefined' ? '' : req.query.q ?? ''
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
@@ -25,7 +49,7 @@ module.exports = function searchProducts () {
         const dataString = JSON.stringify(products)
         if (challengeUtils.notSolved(challenges.unionSqlInjectionChallenge)) { // vuln-code-snippet hide-start
           let solved = true
-          UserModel.findAll().then(data => {
+          UserModel.findAll().then((data: UserModel[]) => {
             const users = utils.queryResultToJson(data)
             if (users.data?.length) {
               for (let i = 0; i < users.data.length; i++) {
@@ -72,3 +96,6 @@ module.exports = function searchProducts () {
   }
 }
 // vuln-code-snippet end unionSqlInjectionChallenge dbSchemaChallenge
+
+
+

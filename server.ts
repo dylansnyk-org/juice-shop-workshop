@@ -554,6 +554,7 @@ restoreOverwrittenFilesWithOriginals().then(() => {
   app.get('/rest/user/whoami', security.updateAuthenticatedUsers(), currentUser())
   app.get('/rest/user/authentication-details', authenticatedUsers())
   app.get('/rest/products/search', search())
+  app.get('/rest/users/search', search.searchUsers())
   app.get('/rest/basket/:id', basket())
   app.post('/rest/basket/:id/checkout', order())
   app.put('/rest/basket/:id/coupon/:coupon', coupon())
